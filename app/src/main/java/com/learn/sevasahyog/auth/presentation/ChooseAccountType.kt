@@ -60,7 +60,9 @@ fun ChooseAccountType(navController: NavController) {
 
                 // navigate to SignUp as User
                 Button(
-                    onClick = { },
+                    onClick = {
+                        navController.navigate("auth/signUpUser")
+                    },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Row {
