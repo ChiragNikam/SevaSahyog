@@ -1,12 +1,15 @@
 package com.learn.sevasahyog.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.learn.sevasahyog.auth.domain.SignInViewModel
 import com.learn.sevasahyog.auth.presentation.ChooseAccountType
 import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
@@ -17,6 +20,7 @@ fun AppNavigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "auth") {
         navigation(startDestination = "auth/signIn", route = "auth"){
             composable(route = "auth/signIn"){
+
                 SignIn(navController = navController)
             }
             composable(route = "auth/chooseAccountType"){

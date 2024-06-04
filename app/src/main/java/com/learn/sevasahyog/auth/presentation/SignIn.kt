@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -45,10 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.domain.SignInViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun SignIn(navController: NavController) {
+fun SignIn(
+    navController: NavController,
+    viewModel: SignInViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val context = LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -87,21 +94,39 @@ fun SignIn(navController: NavController) {
                     .clip(CircleShape)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            var email by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
-            var passwordVisible by remember { mutableStateOf(false) }
 
+            // email
+            val email by viewModel.email.collectAsState()
+            val emailError by viewModel.emailError.collectAsState()
+            val emailErrorMessage by viewModel.emailErrorMessage.collectAsState()
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    viewModel.updateEmailError(false)
+                    viewModel.updateEmail(it)
+                                },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                isError = emailError
             )
+            if (emailError){    // error message of email
+                Text(modifier = Modifier.align(Alignment.Start),text = emailErrorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.labelMedium.fontSize)
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
+
+            // password
+            val password by viewModel.password.collectAsState()
+            val passwordError by viewModel.passwordError.collectAsState()
+            val passwordErrorMessage by viewModel.passwordErrorMessage.collectAsState()
+            var passwordVisible by remember { mutableStateOf(false) }
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    viewModel.updatePasswordError(false)
+                    viewModel.updatePassword(it)
+                                },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -114,13 +139,20 @@ fun SignIn(navController: NavController) {
                         Icon(painter = image, contentDescription = null)
                     }
                 },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                isError = passwordError
             )
+            if (passwordError){ // error message of password
+                Text(modifier = Modifier.align(Alignment.Start), text = passwordErrorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.labelMedium.fontSize)
+            }
+
             Spacer(modifier = Modifier.height(64.dp))
 
             // login
             Button(
-                onClick = { },
+                onClick = {
+                          viewModel.validateSignInData()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
@@ -183,5 +215,7 @@ fun SignIn(navController: NavController) {
 @Preview
 @Composable
 private fun SignInPreview() {
-    SignIn(navController = rememberNavController())
+    SevaSahyogTheme {
+        SignIn(navController = rememberNavController())
+    }
 }
