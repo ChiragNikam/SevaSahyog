@@ -2,6 +2,7 @@ package com.learn.sevasahyog.auth.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -159,6 +161,53 @@ fun SignIn(
                 )
             }
 
+            val userAccountSelected by viewModel.userAccount.collectAsState()
+            val ngoAccountSelected by viewModel.ngoAccount.collectAsState()
+            Row {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            viewModel.updateSelectedNgoAccount(false)
+                            viewModel.updateSelectedUserAccount(true)
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    RadioButton(
+                        selected = userAccountSelected,
+                        onClick = {
+                            viewModel.updateSelectedUserAccount(false)
+                            viewModel.updateSelectedNgoAccount(true)
+                        })
+                    Text(
+                        text = "User",
+                        color = if (userAccountSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            viewModel.updateSelectedUserAccount(false)
+                            viewModel.updateSelectedNgoAccount(true)
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    RadioButton(
+                        selected = ngoAccountSelected,
+                        onClick = {
+                            viewModel.updateSelectedUserAccount(false)
+                            viewModel.updateSelectedNgoAccount(true)
+                        })
+                    Text(
+                        text = "Ngo",
+                        color = if (ngoAccountSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(64.dp))
 
             // login
@@ -168,7 +217,7 @@ fun SignIn(
             Button(
                 onClick = {
                     val isDataOk = viewModel.validateSignInData()
-                    if(isDataOk){
+                    if (isDataOk) {
                         loginProgress = true
                         viewModel.login()
                     }
@@ -176,11 +225,11 @@ fun SignIn(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                    Text("Login")
-                    if (loginProgress){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        CircularProgressIndicator(trackColor = MaterialTheme.colorScheme.onPrimary)
-                    }
+                Text("Login")
+                if (loginProgress) {
+                    Spacer(modifier = Modifier.width(18.dp))
+                    CircularProgressIndicator(trackColor = MaterialTheme.colorScheme.onPrimary)
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

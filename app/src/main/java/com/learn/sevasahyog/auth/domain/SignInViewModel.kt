@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.lang.Error
 
 class SignInViewModel : ViewModel() {
+    // email
     private val _email = MutableStateFlow("")
     val email get() = _email.asStateFlow()
 
@@ -48,6 +49,21 @@ class SignInViewModel : ViewModel() {
 
     fun updatePasswordErrorMessage(updatedPasswordErrorMessage: String) {
         this._passwordErrorMessage.value = updatedPasswordErrorMessage
+    }
+
+    // account type
+    private val _userAccount = MutableStateFlow(true)
+    val userAccount get() = _userAccount.asStateFlow()
+
+    fun updateSelectedUserAccount(selected: Boolean){
+        _userAccount.value = selected
+    }
+
+    private val _ngoAccount = MutableStateFlow(false)
+    val ngoAccount get() = _ngoAccount.asStateFlow()
+
+    fun updateSelectedNgoAccount(selected: Boolean){
+        _ngoAccount.value = selected
     }
 
     fun validateSignInData(): Boolean {
