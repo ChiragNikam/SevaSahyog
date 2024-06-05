@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,8 +20,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -104,14 +107,19 @@ fun SignIn(
                 onValueChange = {
                     viewModel.updateEmailError(false)
                     viewModel.updateEmail(it)
-                                },
+                },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = emailError
             )
-            if (emailError){    // error message of email
-                Text(modifier = Modifier.align(Alignment.Start),text = emailErrorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.labelMedium.fontSize)
+            if (emailError) {    // error message of email
+                Text(
+                    modifier = Modifier.align(Alignment.Start),
+                    text = emailErrorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = MaterialTheme.typography.labelMedium.fontSize
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -126,7 +134,7 @@ fun SignIn(
                 onValueChange = {
                     viewModel.updatePasswordError(false)
                     viewModel.updatePassword(it)
-                                },
+                },
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -142,21 +150,37 @@ fun SignIn(
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 isError = passwordError
             )
-            if (passwordError){ // error message of password
-                Text(modifier = Modifier.align(Alignment.Start), text = passwordErrorMessage, color = MaterialTheme.colorScheme.error, fontSize = MaterialTheme.typography.labelMedium.fontSize)
+            if (passwordError) { // error message of password
+                Text(
+                    modifier = Modifier.align(Alignment.Start),
+                    text = passwordErrorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = MaterialTheme.typography.labelMedium.fontSize
+                )
             }
 
             Spacer(modifier = Modifier.height(64.dp))
 
             // login
+            var loginProgress by remember {
+                mutableStateOf(false)
+            }
             Button(
                 onClick = {
-                          viewModel.validateSignInData()
+                    val isDataOk = viewModel.validateSignInData()
+                    if(isDataOk){
+                        loginProgress = true
+                        viewModel.login()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text("Login")
+                    Text("Login")
+                    if (loginProgress){
+                        Spacer(modifier = Modifier.width(18.dp))
+                        CircularProgressIndicator(trackColor = MaterialTheme.colorScheme.onPrimary)
+                    }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

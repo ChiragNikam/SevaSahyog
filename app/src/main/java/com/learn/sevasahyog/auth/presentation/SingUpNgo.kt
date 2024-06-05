@@ -195,6 +195,7 @@ fun SignUpNgo(navController: NavController) {
             
             Spacer(modifier = Modifier.height(42.dp))
 
+            // create account
             Button(
                 onClick = {},
                 modifier = Modifier

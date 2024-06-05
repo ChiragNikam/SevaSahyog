@@ -1,11 +1,12 @@
 package com.learn.sevasahyog.auth.domain
 
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.lang.Error
 
-class SignInViewModel: ViewModel() {
+class SignInViewModel : ViewModel() {
     private val _email = MutableStateFlow("")
     val email get() = _email.asStateFlow()
 
@@ -15,15 +16,15 @@ class SignInViewModel: ViewModel() {
     private val _emailErrorMessage = MutableStateFlow("")
     val emailErrorMessage get() = _emailErrorMessage.asStateFlow()
 
-    fun updateEmail(updatedEmail: String){
+    fun updateEmail(updatedEmail: String) {
         this._email.value = updatedEmail
     }
 
-    fun updateEmailError(updatedEmailError: Boolean){
+    fun updateEmailError(updatedEmailError: Boolean) {
         this._emailError.value = updatedEmailError
     }
 
-    fun updateEmailErrorMessage(updatedEmailErrorMessage: String){
+    fun updateEmailErrorMessage(updatedEmailErrorMessage: String) {
         this._emailErrorMessage.value = updatedEmailErrorMessage
     }
 
@@ -37,19 +38,19 @@ class SignInViewModel: ViewModel() {
     private val _passwordErrorMessage = MutableStateFlow("")
     val passwordErrorMessage get() = _passwordErrorMessage.asStateFlow()
 
-    fun updatePassword(updatedPassword: String){
+    fun updatePassword(updatedPassword: String) {
         this._password.value = updatedPassword
     }
 
-    fun updatePasswordError(updatePasswordError: Boolean){
+    fun updatePasswordError(updatePasswordError: Boolean) {
         this._passwordError.value = updatePasswordError
     }
 
-    fun updatePasswordErrorMessage(updatedPasswordErrorMessage: String){
+    fun updatePasswordErrorMessage(updatedPasswordErrorMessage: String) {
         this._passwordErrorMessage.value = updatedPasswordErrorMessage
     }
 
-    fun validateSignInData(){
+    fun validateSignInData(): Boolean {
         if (email.value.isEmpty()) {
             _emailError.value = true
             _emailErrorMessage.value = "Please enter email"
@@ -58,5 +59,16 @@ class SignInViewModel: ViewModel() {
             _passwordError.value = true
             _passwordErrorMessage.value = "Please enter password"
         }
+
+        return !(emailError.value && passwordError.value)
+    }
+
+    private val _loginError = MutableStateFlow(false)
+    val loginError get() = _loginError.asStateFlow()
+
+    private val _loginErrorMessage = MutableStateFlow("")
+
+    fun login() {
+
     }
 }

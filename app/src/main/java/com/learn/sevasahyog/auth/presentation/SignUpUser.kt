@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -28,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,10 +48,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.common.ValidatedTextField
+import com.learn.sevasahyog.auth.common.ValidatedTextFieldPassword
+import com.learn.sevasahyog.auth.domain.SignUpUserViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun SingUpUser(navController: NavController) {
+fun SingUpUser(
+    navController: NavController,
+    viewModel: SignUpUserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -104,71 +113,101 @@ fun SingUpUser(navController: NavController) {
                         modifier = Modifier.size(126.dp)
                     )
                 }
-                // admin name
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("User Name*") },
-                )
+                // user name
+                val userName by viewModel.userName.collectAsState()
+                val userNameError by viewModel.userNameError.collectAsState()
+                val userNameErrorMessage by viewModel.userNameErrorMessage.collectAsState()
+                ValidatedTextField(
+                    textFieldModifier = Modifier.fillMaxWidth(),
+                    label = "User Name*",
+                    value = userName,
+                    error = userNameError,
+                    errorMessage = userNameErrorMessage
+                ) {
+                    viewModel.updateUserNameError(false)
+                    viewModel.updateUserName(it)
+                }
+
                 // phone no
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Phone No.*") },
-                )
+                val phoneNo by viewModel.phoneNo.collectAsState()
+                val phoneNoError by viewModel.phoneNoError.collectAsState()
+                val phoneNoErrorMessage by viewModel.phoneNoErrorMessage.collectAsState()
+                ValidatedTextField(
+                    textFieldModifier = Modifier.fillMaxWidth(),
+                    label = "Phone No.*",
+                    value = phoneNo,
+                    error = phoneNoError,
+                    errorMessage = phoneNoErrorMessage,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                ) {
+                    viewModel.updatePhoneNoError(false)
+                    viewModel.updatePhoneNo(it)
+                }
+
                 // email
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Email*") },
-                )
+                val email by viewModel.email.collectAsState()
+                val emailError by viewModel.emailError.collectAsState()
+                val emailErrorMessage by viewModel.emailErrorMessage.collectAsState()
+                ValidatedTextField(
+                    textFieldModifier = Modifier.fillMaxWidth(),
+                    label = "Email*",
+                    value = email,
+                    error = emailError,
+                    errorMessage = emailErrorMessage,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                ) {
+                    viewModel.updateEmailError(false)
+                    viewModel.updateEmail(it)
+                }
 
-                var passwordVisible by remember { mutableStateOf(false) }
                 // password
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Password") },
-                    trailingIcon = {
-                        val image = if (passwordVisible)
-                            painterResource(id = R.drawable.ic_visible)
-                        else painterResource(id = R.drawable.ic_not_visible)
-
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(painter = image, contentDescription = null)
-                        }
+                var passwordVisible by remember { mutableStateOf(false) }
+                val password by viewModel.password.collectAsState()
+                val passwordError by viewModel.passwordError.collectAsState()
+                val passwordErrorMessage by viewModel.passwordErrorMessage.collectAsState()
+                ValidatedTextFieldPassword(
+                    label = "Password",
+                    value = password,
+                    error = passwordError,
+                    errorMessage = passwordErrorMessage,
+                    passwordVisible = passwordVisible,
+                    onValueChange = {
+                        viewModel.updatePasswordError(false)
+                        viewModel.updatePassword(it)
                     },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
+                    onIconClick = {
+                        passwordVisible = !passwordVisible
+                    }
                 )
 
-                var confirmPasswordVisible by remember { mutableStateOf(false) }
                 // confirm password
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Confirm Password") },
-                    trailingIcon = {
-                        val image = if (confirmPasswordVisible)
-                            painterResource(id = R.drawable.ic_visible)
-                        else painterResource(id = R.drawable.ic_not_visible)
-
-                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                            Icon(painter = image, contentDescription = null)
-                        }
+                var confirmPasswordVisible by remember { mutableStateOf(false) }
+                val confirmPassword by viewModel.confirmPassword.collectAsState()
+                val confirmPasswordError by viewModel.confirmPasswordError.collectAsState()
+                val confirmPasswordErrorMessage by viewModel.confirmPasswordErrorMessage.collectAsState()
+                ValidatedTextFieldPassword(
+                    label = "Password",
+                    value = confirmPassword,
+                    error = confirmPasswordError,
+                    errorMessage = confirmPasswordErrorMessage,
+                    passwordVisible = confirmPasswordVisible,
+                    onValueChange = {
+                        viewModel.updateConfirmPasswordError(false)
+                        viewModel.updateConfirmPassword(it)
                     },
-                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
+                    onIconClick = {
+                        confirmPasswordVisible = !confirmPasswordVisible
+                    }
                 )
             }
 
             Spacer(modifier = Modifier.height(42.dp))
 
+            // create account
             Button(
-                onClick = {},
+                onClick = {
+                          viewModel.validateSignUpUserData()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 8.dp)
