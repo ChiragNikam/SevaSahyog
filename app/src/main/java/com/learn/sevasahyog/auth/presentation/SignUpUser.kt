@@ -3,6 +3,7 @@ package com.learn.sevasahyog.auth.presentation
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -41,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -78,6 +82,32 @@ fun SingUpUser(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
+            val commonError by viewModel.commonError.collectAsState()
+            val commonErrorMessage by viewModel.commonErrorMessage.collectAsState()
+            if (commonError){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.error,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.weight(125f),
+                        text = commonErrorMessage,
+                        color = MaterialTheme.colorScheme.onError,
+                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(modifier = Modifier.size(24.dp).clickable { viewModel.updateCommonError(false) }, imageVector = Icons.Filled.Close, contentDescription = "close error", tint = MaterialTheme.colorScheme.onErrorContainer)
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,7 +236,7 @@ fun SingUpUser(
             // create account
             Button(
                 onClick = {
-                          viewModel.validateSignUpUserData()
+                    viewModel.validateSignUpUserData()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

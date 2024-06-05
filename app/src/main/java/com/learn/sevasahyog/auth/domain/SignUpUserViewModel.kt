@@ -4,14 +4,19 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SignUpUserViewModel: ViewModel() {
+class SignUpUserViewModel : ViewModel() {
 
     // common Error
-    private val _commonError = MutableStateFlow(false);
+    private val _commonError = MutableStateFlow(true);
     val commonError get() = _commonError.asStateFlow()
 
-    private val _commonErrorMessage = MutableStateFlow("");
+    private val _commonErrorMessage = MutableStateFlow("Something Went Wrong");
+
     val commonErrorMessage get() = _commonErrorMessage.asStateFlow()
+
+    fun updateCommonError(error: Boolean) {
+        _commonError.value = error
+    }
 
     // user name
     private val _userName = MutableStateFlow("");
@@ -23,11 +28,11 @@ class SignUpUserViewModel: ViewModel() {
     private val _userNameErrorMessage = MutableStateFlow("")
     val userNameErrorMessage get() = _userNameErrorMessage.asStateFlow()
 
-    fun updateUserName(userName: String){
+    fun updateUserName(userName: String) {
         this._userName.value = userName
     }
 
-    fun updateUserNameError(error: Boolean){
+    fun updateUserNameError(error: Boolean) {
         this._userNameError.value = error
     }
 
@@ -41,11 +46,11 @@ class SignUpUserViewModel: ViewModel() {
     private val _phoneNoErrorMessage = MutableStateFlow("")
     val phoneNoErrorMessage get() = _phoneNoErrorMessage.asStateFlow()
 
-    fun updatePhoneNo(phoneNo: String){
+    fun updatePhoneNo(phoneNo: String) {
         this._phoneNo.value = phoneNo
     }
 
-    fun updatePhoneNoError(error: Boolean){
+    fun updatePhoneNoError(error: Boolean) {
         this._phoneNoError.value = error
     }
 
@@ -59,11 +64,11 @@ class SignUpUserViewModel: ViewModel() {
     private val _emailErrorMessage = MutableStateFlow("")
     val emailErrorMessage get() = _emailErrorMessage.asStateFlow()
 
-    fun updateEmail(email: String){
+    fun updateEmail(email: String) {
         this._email.value = email
     }
 
-    fun updateEmailError(error: Boolean){
+    fun updateEmailError(error: Boolean) {
         this._emailError.value = error
     }
 
@@ -77,11 +82,11 @@ class SignUpUserViewModel: ViewModel() {
     private val _passwordErrorMessage = MutableStateFlow("")
     val passwordErrorMessage get() = _passwordErrorMessage.asStateFlow()
 
-    fun updatePassword(password: String){
+    fun updatePassword(password: String) {
         this._password.value = password
     }
 
-    fun updatePasswordError(error: Boolean){
+    fun updatePasswordError(error: Boolean) {
         _passwordError.value = error
     }
 
@@ -95,32 +100,32 @@ class SignUpUserViewModel: ViewModel() {
     private val _confirmPasswordErrorMessage = MutableStateFlow("")
     val confirmPasswordErrorMessage get() = _confirmPasswordErrorMessage.asStateFlow()
 
-    fun updateConfirmPassword(confirmPassword: String){
+    fun updateConfirmPassword(confirmPassword: String) {
         this._confirmPassword.value = confirmPassword
     }
 
-    fun updateConfirmPasswordError(error: Boolean){
+    fun updateConfirmPasswordError(error: Boolean) {
         this._confirmPasswordError.value = error
     }
 
-    fun validateSignUpUserData(): Boolean{
-        if (userName.value.isEmpty()){
+    fun validateSignUpUserData(): Boolean {
+        if (userName.value.isEmpty()) {
             _userNameError.value = true
             _userNameErrorMessage.value = "Please enter user-name"
         }
-        if (phoneNo.value.isEmpty()){
+        if (phoneNo.value.isEmpty()) {
             _phoneNoError.value = true
             _phoneNoErrorMessage.value = "Please enter phone"
         }
-        if (email.value.isEmpty()){
+        if (email.value.isEmpty()) {
             _emailError.value = true
             _emailErrorMessage.value = "Please enter email"
         }
-        if (password.value.isEmpty()){
+        if (password.value.isEmpty()) {
             _passwordError.value = true
             _passwordErrorMessage.value = "Please enter password"
         }
-        if (password.value != confirmPassword.value){
+        if (password.value != confirmPassword.value) {
             _confirmPasswordError.value = true
             _confirmPasswordErrorMessage.value = "Didn't mach with password"
         }
