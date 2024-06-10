@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.common.CommonErrorMessageView
 import com.learn.sevasahyog.auth.common.ValidatedTextField
 import com.learn.sevasahyog.auth.common.ValidatedTextFieldPassword
 import com.learn.sevasahyog.auth.domain.SignUpUserViewModel
@@ -84,29 +85,8 @@ fun SingUpUser(
             Spacer(modifier = Modifier.height(32.dp))
             val commonError by viewModel.commonError.collectAsState()
             val commonErrorMessage by viewModel.commonErrorMessage.collectAsState()
-            if (commonError){
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.error,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.weight(125f),
-                        text = commonErrorMessage,
-                        color = MaterialTheme.colorScheme.onError,
-                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Icon(modifier = Modifier.size(24.dp).clickable { viewModel.updateCommonError(false) }, imageVector = Icons.Filled.Close, contentDescription = "close error", tint = MaterialTheme.colorScheme.onErrorContainer)
-                }
-                Spacer(modifier = Modifier.height(12.dp))
+            CommonErrorMessageView(commonError = commonError, commonErrorMessage = commonErrorMessage) {
+                viewModel.updateCommonError(false)
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

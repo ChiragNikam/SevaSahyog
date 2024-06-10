@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.common.CommonErrorMessageView
 import com.learn.sevasahyog.auth.domain.SignInViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
@@ -98,6 +99,15 @@ fun SignIn(
                     .size(100.dp)
                     .clip(CircleShape)
             )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            val loginError by viewModel.loginError.collectAsState()
+            val loginErrorMessage by viewModel.loginErrorMessage.collectAsState()
+            CommonErrorMessageView(commonError = loginError, commonErrorMessage = loginErrorMessage) {
+                viewModel.updateLoginError(false)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // email
@@ -161,6 +171,8 @@ fun SignIn(
                 )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             val userAccountSelected by viewModel.userAccount.collectAsState()
             val ngoAccountSelected by viewModel.ngoAccount.collectAsState()
             Row {
@@ -177,11 +189,12 @@ fun SignIn(
                     RadioButton(
                         selected = userAccountSelected,
                         onClick = {
-                            viewModel.updateSelectedUserAccount(false)
-                            viewModel.updateSelectedNgoAccount(true)
+                            viewModel.updateSelectedNgoAccount(false)
+                            viewModel.updateSelectedUserAccount(true)
                         })
                     Text(
                         text = "User",
+                        fontWeight = FontWeight(if (userAccountSelected) 900 else 400),
                         color = if (userAccountSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
@@ -203,6 +216,7 @@ fun SignIn(
                         })
                     Text(
                         text = "Ngo",
+                        fontWeight = FontWeight(if (ngoAccountSelected) 900 else 400),
                         color = if (ngoAccountSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
@@ -211,14 +225,12 @@ fun SignIn(
             Spacer(modifier = Modifier.height(64.dp))
 
             // login
-            var loginProgress by remember {
-                mutableStateOf(false)
-            }
+            val loginProgress by viewModel.loginProgress.collectAsState()
             Button(
                 onClick = {
                     val isDataOk = viewModel.validateSignInData()
                     if (isDataOk) {
-                        loginProgress = true
+                        viewModel.updateLoginProgress(true)
                         viewModel.login()
                     }
                 },

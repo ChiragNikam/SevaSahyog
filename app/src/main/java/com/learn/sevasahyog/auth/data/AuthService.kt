@@ -7,6 +7,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthService {
-    @POST("/auth/signIn")
+    @POST("/auth/ngo/signIn")
     fun signInAsNgo(@Body request: SignInRequest): Call<SignInResponseNgo>
 }
