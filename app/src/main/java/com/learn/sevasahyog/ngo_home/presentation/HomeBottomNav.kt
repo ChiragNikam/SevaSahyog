@@ -1,4 +1,4 @@
-package com.learn.sevasahyog.home.presentation
+package com.learn.sevasahyog.ngo_home.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController

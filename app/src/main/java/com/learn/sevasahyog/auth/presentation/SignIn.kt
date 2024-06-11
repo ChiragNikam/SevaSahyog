@@ -1,5 +1,6 @@
 package com.learn.sevasahyog.auth.presentation
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,16 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -53,6 +49,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.auth.common.CommonErrorMessageView
+import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.auth.domain.SignInViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
@@ -102,10 +99,13 @@ fun SignIn(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            val loginError by viewModel.loginError.collectAsState()
-            val loginErrorMessage by viewModel.loginErrorMessage.collectAsState()
-            CommonErrorMessageView(commonError = loginError, commonErrorMessage = loginErrorMessage) {
-                viewModel.updateLoginError(false)
+            val loginError by viewModel.signInError.collectAsState()
+            val loginErrorMessage by viewModel.signInErrorMessage.collectAsState()
+            CommonErrorMessageView(
+                commonError = loginError,
+                commonErrorMessage = loginErrorMessage
+            ) {
+                viewModel.updateSignInError(false)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -180,8 +180,8 @@ fun SignIn(
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            viewModel.updateSelectedNgoAccount(false)
-                            viewModel.updateSelectedUserAccount(true)
+                            viewModel.isNgoAccountSelected(false)
+                            viewModel.isUserAccountSelected(true)
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -189,8 +189,8 @@ fun SignIn(
                     RadioButton(
                         selected = userAccountSelected,
                         onClick = {
-                            viewModel.updateSelectedNgoAccount(false)
-                            viewModel.updateSelectedUserAccount(true)
+                            viewModel.isNgoAccountSelected(false)
+                            viewModel.isUserAccountSelected(true)
                         })
                     Text(
                         text = "User",
@@ -202,8 +202,8 @@ fun SignIn(
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            viewModel.updateSelectedUserAccount(false)
-                            viewModel.updateSelectedNgoAccount(true)
+                            viewModel.isUserAccountSelected(false)
+                            viewModel.isNgoAccountSelected(true)
                         },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -211,8 +211,8 @@ fun SignIn(
                     RadioButton(
                         selected = ngoAccountSelected,
                         onClick = {
-                            viewModel.updateSelectedUserAccount(false)
-                            viewModel.updateSelectedNgoAccount(true)
+                            viewModel.isUserAccountSelected(false)
+                            viewModel.isNgoAccountSelected(true)
                         })
                     Text(
                         text = "Ngo",
@@ -225,20 +225,21 @@ fun SignIn(
             Spacer(modifier = Modifier.height(64.dp))
 
             // login
-            val loginProgress by viewModel.loginProgress.collectAsState()
+            val signInProgress by viewModel.signInProgress.collectAsState()
             Button(
                 onClick = {
                     val isDataOk = viewModel.validateSignInData()
                     if (isDataOk) {
-                        viewModel.updateLoginProgress(true)
+                        viewModel.updateSignInProgress(true)
                         viewModel.login()
+
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
                 Text("Login")
-                if (loginProgress) {
+                if (signInProgress) {
                     Spacer(modifier = Modifier.width(18.dp))
                     CircularProgressIndicator(trackColor = MaterialTheme.colorScheme.onPrimary)
                 }
@@ -294,6 +295,27 @@ fun SignIn(
                 }
             }
         }
+    }
+
+    // create signIn session after successful signIn, by saving token and user data to the SharedPreference
+    val signInToken by viewModel.signInToken.collectAsState()
+    val ngoSignInSuccess by viewModel.ngoSignInSuccess.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val uid by viewModel.userId.collectAsState()
+    if (ngoSignInSuccess) {
+        val session = SessionManager(context)
+        session.createLoginSession(
+            token = signInToken,
+            email = email,
+            password = password,
+            uid = uid
+        )
+        Log.d("login_session", "session saved, ${session.getUserDetails()}")
+
+        // redirect user to ngo screens if ngo signIn success
+        navController.navigate("ngo")
+        navController.popBackStack()
     }
 }
 

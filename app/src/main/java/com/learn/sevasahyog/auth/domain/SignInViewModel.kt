@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
 import com.learn.sevasahyog.auth.data.dataclass.SignInRequest
-import com.learn.sevasahyog.auth.data.dataclass.SignInResponseNgo
 import com.learn.sevasahyog.auth.repo.AuthRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,14 +60,14 @@ class SignInViewModel : ViewModel() {
     private val _userAccount = MutableStateFlow(true)
     val userAccount get() = _userAccount.asStateFlow()
 
-    fun updateSelectedUserAccount(selected: Boolean) {
+    fun isUserAccountSelected(selected: Boolean) {
         _userAccount.value = selected
     }
 
     private val _ngoAccount = MutableStateFlow(false)
     val ngoAccount get() = _ngoAccount.asStateFlow()
 
-    fun updateSelectedNgoAccount(selected: Boolean) {
+    fun isNgoAccountSelected(selected: Boolean) {
         _ngoAccount.value = selected
     }
 
@@ -86,23 +85,35 @@ class SignInViewModel : ViewModel() {
     }
 
     // signIn error
-    private val _loginError = MutableStateFlow(false)
-    val loginError get() = _loginError.asStateFlow()
+    private val _signInError = MutableStateFlow(false)
+    val signInError get() = _signInError.asStateFlow()
 
-    private val _loginErrorMessage = MutableStateFlow("")
-    val loginErrorMessage get() = _loginErrorMessage
+    private val _signInErrorMessage = MutableStateFlow("")
+    val signInErrorMessage get() = _signInErrorMessage
 
-    fun updateLoginError(error: Boolean) {
-        _loginError.value = error
+    fun updateSignInError(error: Boolean) {
+        _signInError.value = error
     }
 
     // signIn progress
-    private val _loginProgress = MutableStateFlow(false)
-    val loginProgress get() = _loginProgress.asStateFlow()
+    private val _signInProgress = MutableStateFlow(false)
+    val signInProgress get() = _signInProgress.asStateFlow()
 
-    fun updateLoginProgress(progress: Boolean) {
-        _loginProgress.value = progress
+    fun updateSignInProgress(progress: Boolean) {
+        _signInProgress.value = progress
     }
+
+    // signIn token
+    private val _signInToken = MutableStateFlow("")
+    val signInToken get() = _signInToken
+
+    // user id
+    private val _userId = MutableStateFlow("")
+    val userId get() = _userId
+
+    // login success
+    private val _ngoSignInSuccess = MutableStateFlow(false)
+    val ngoSignInSuccess get() = _ngoSignInSuccess
 
     fun login() {
         viewModelScope.launch {
@@ -111,7 +122,7 @@ class SignInViewModel : ViewModel() {
             } else {    // if user account selected
                 loginAsUser()
             }
-            _loginProgress.value = false
+            _signInProgress.value = false
         }
     }
 
@@ -124,13 +135,20 @@ class SignInViewModel : ViewModel() {
         authRepo.ngoSignIn(
             signInData = SignInRequest(email = email.value, password = password.value),
             onResponse = { call, response ->
-                if (response.code() == 409) {
+                if (response.code() == 200) {
+                    _ngoSignInSuccess.value = true
+                    val signInResponse = response.body()
+                    if (signInResponse != null){
+                        _signInToken.value = signInResponse.token
+                        _userId.value = signInResponse.ngoAccount.userId
+                    }
+                } else if (response.code() == 409) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody.let {
                         Gson().fromJson(it, ErrorResponse::class.java)
                     }
-                    _loginError.value = true
-                    _loginErrorMessage.value = errorResponse.errorMessage
+                    _signInError.value = true
+                    _signInErrorMessage.value = errorResponse.errorMessage
                     Log.e("login_error", errorResponse.errorMessage)
                 } else {
                     Log.i("login_success", "success")
@@ -138,8 +156,8 @@ class SignInViewModel : ViewModel() {
             },
             onFailure = { call, t ->
                 t.message?.let { Log.e("login_error", it) }
-                _loginError.value = true
-                _loginErrorMessage.value = t.message.toString()
+                _signInError.value = true
+                _signInErrorMessage.value = t.message.toString()
             }
         )
     }

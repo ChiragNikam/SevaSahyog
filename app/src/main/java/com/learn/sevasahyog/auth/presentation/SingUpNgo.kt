@@ -41,10 +41,11 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.auth.domain.SignUpNgoViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun SignUpNgo(navController: NavController) {
+fun SignUpNgo(navController: NavController, viewModel: SignUpNgoViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +84,7 @@ fun SignUpNgo(navController: NavController) {
                     ) {}
                 }
 
-                // user profile
+                // user profile photo
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
