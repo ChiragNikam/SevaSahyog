@@ -5,6 +5,7 @@ import com.learn.sevasahyog.auth.data.dataclass.SignInRequest
 import com.learn.sevasahyog.auth.data.dataclass.SignInResponseNgo
 import com.learn.sevasahyog.auth.data.dataclass.SignUpRequestNgo
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 

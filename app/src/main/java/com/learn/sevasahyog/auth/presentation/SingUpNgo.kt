@@ -68,7 +68,7 @@ fun SignUpNgo(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = "Create Admin \nAccount",
+                text = "Create Ngo \nAccount",
                 modifier = Modifier
                     .fillMaxWidth(),
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -273,7 +273,9 @@ fun SignUpNgo(
                         if (it.length <= 1000)
                             viewModel.updateLongDesc(it)
                     },
-                    modifier = Modifier.height(156.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .height(156.dp)
+                        .fillMaxWidth(),
                     label = { Text("Moto, What you focus upon (1000 words)") },
                 )
             }
@@ -282,13 +284,21 @@ fun SignUpNgo(
 
             // create account
             Button(
-                onClick = {},
+                onClick = {
+                          viewModel.signUpAsNgo()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 8.dp)
             ) {
                 Text(text = "Create Account")
             }
+        }
+        val signUpSuccess by viewModel.signUpSuccess.collectAsState()
+        val signInSuccess by viewModel.signInSuccess.collectAsState()
+        // move to home screen if user successfully signedUp and signedIn
+        if (signUpSuccess && signInSuccess){
+            navController.navigate("ngo")
         }
 
     }
