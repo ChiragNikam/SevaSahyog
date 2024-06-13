@@ -25,7 +25,13 @@ class SessionManager(context: Context?) {
         editor = pref?.edit()
     }
 
-    fun createLoginSession(token: String?, email: String?, password: String?, uid: String?, userType: String) {
+    fun createLoginSession(
+        token: String?,
+        email: String?,
+        password: String?,
+        uid: String?,
+        userType: String
+    ) {
         editor!!.putBoolean(KEY_IS_LOGGED_IN, true)
         editor!!.putString(KEY_TOKEN, token)
         editor!!.putString(KEY_EMAIL, email)
@@ -53,15 +59,10 @@ class SessionManager(context: Context?) {
         return user
     }
 
-    fun logoutUser() {
+    fun logoutUser(): Boolean {
         editor!!.clear()
         editor!!.commit()
-
-        // Redirect to login activity
-        // Intent intent = new Intent(context, LoginActivity.class);
-        // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        // context.startActivity(intent);
+        return true
     }
 
     fun isLoggedIn(): Boolean {
