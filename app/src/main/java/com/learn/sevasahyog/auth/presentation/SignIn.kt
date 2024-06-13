@@ -59,6 +59,10 @@ fun SignIn(
     viewModel: SignInViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
+    val session = SessionManager(context)
+    if (session.isLoggedIn()) {
+        navController.navigate("ngo")
+    }
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -232,7 +236,6 @@ fun SignIn(
                     if (isDataOk) {
                         viewModel.updateSignInProgress(true)
                         viewModel.login()
-
                     }
                 },
                 modifier = Modifier
@@ -296,12 +299,12 @@ fun SignIn(
             }
         }
     }
-
     // create signIn session after successful signIn, by saving token and user data to the SharedPreference
     val signInToken by viewModel.signInToken.collectAsState()
     val ngoSignInSuccess by viewModel.ngoSignInSuccess.collectAsState()
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
+    val userAccountSelected by viewModel.userAccount.collectAsState()
     val uid by viewModel.userId.collectAsState()
     if (ngoSignInSuccess) {
         val session = SessionManager(context)
@@ -309,7 +312,8 @@ fun SignIn(
             token = signInToken,
             email = email,
             password = password,
-            uid = uid
+            uid = uid,
+            userType = if (userAccountSelected) "user" else "ngo"
         )
         Log.d("login_session", "session saved, ${session.getUserDetails()}")
 
@@ -317,6 +321,7 @@ fun SignIn(
         navController.navigate("ngo")
         navController.popBackStack()
     }
+
 }
 
 @Preview

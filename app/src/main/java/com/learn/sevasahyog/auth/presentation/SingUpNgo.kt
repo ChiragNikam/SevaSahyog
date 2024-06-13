@@ -2,6 +2,7 @@ package com.learn.sevasahyog.auth.presentation
 
 
 import android.provider.MediaStore.Images
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +53,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.common.ValidatedTextField
 import com.learn.sevasahyog.auth.common.ValidatedTextFieldPassword
+import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.auth.domain.SignUpNgoViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
@@ -59,6 +62,7 @@ fun SignUpNgo(
     navController: NavController,
     viewModel: SignUpNgoViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    val context = LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -66,6 +70,27 @@ fun SignUpNgo(
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 24.dp, vertical = 32.dp)
     ) {
+        // user data
+        val adminName by viewModel.adminName.collectAsState()
+        val adminNameError by viewModel.adminNameError.collectAsState()
+        val adminNameErrorMessage by viewModel.adminNameErrorMessage.collectAsState()
+
+        val phoneNo by viewModel.phoneNo.collectAsState()
+        val phoneNoError by viewModel.phoneNoError.collectAsState()
+        val phoneNoErrorMessage by viewModel.phoneNoErrorMessage.collectAsState()
+
+        val email by viewModel.email.collectAsState()
+        val emailError by viewModel.emailError.collectAsState()
+        val emailErrorMessage by viewModel.emailErrorMessage.collectAsState()
+
+        val password by viewModel.password.collectAsState()
+        val passwordError by viewModel.passwordError.collectAsState()
+        val passwordErrorMessage by viewModel.passwordErrorMessage.collectAsState()
+
+        val confirmPass by viewModel.confirmPass.collectAsState()
+        val confirmPassError by viewModel.confirmPassError.collectAsState()
+        val confirmPassErrorMessage by viewModel.confirmPassErrorMessage.collectAsState()
+
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
                 text = "Create Ngo \nAccount",
@@ -97,27 +122,6 @@ fun SignUpNgo(
                     ) {}
                 }
 
-                // user data
-                val adminName by viewModel.adminName.collectAsState()
-                val adminNameError by viewModel.adminNameError.collectAsState()
-                val adminNameErrorMessage by viewModel.adminNameErrorMessage.collectAsState()
-
-                val phoneNo by viewModel.phoneNo.collectAsState()
-                val phoneNoError by viewModel.phoneNoError.collectAsState()
-                val phoneNoErrorMessage by viewModel.phoneNoErrorMessage.collectAsState()
-
-                val email by viewModel.email.collectAsState()
-                val emailError by viewModel.emailError.collectAsState()
-                val emailErrorMessage by viewModel.emailErrorMessage.collectAsState()
-
-                val password by viewModel.password.collectAsState()
-                val passwordError by viewModel.passwordError.collectAsState()
-                val passwordErrorMessage by viewModel.passwordErrorMessage.collectAsState()
-
-                val confirmPass by viewModel.confirmPass.collectAsState()
-                val confirmPassError by viewModel.confirmPassError.collectAsState()
-                val confirmPassErrorMessage by viewModel.confirmPassErrorMessage.collectAsState()
-
                 // user profile photo
                 Box(
                     modifier = Modifier
@@ -142,6 +146,7 @@ fun SignUpNgo(
                     error = adminNameError,
                     errorMessage = adminNameErrorMessage
                 ) {
+                    viewModel.updateAdminNameError(false)
                     viewModel.updateAdminName(it)
                 }
 
@@ -152,6 +157,7 @@ fun SignUpNgo(
                     error = phoneNoError,
                     errorMessage = phoneNoErrorMessage
                 ) {
+                    viewModel.updatePhoneNoError(false)
                     viewModel.updatePhoneNo(it)
                 }
 
@@ -162,6 +168,7 @@ fun SignUpNgo(
                     error = emailError,
                     errorMessage = emailErrorMessage
                 ) {
+                    viewModel.updateEmailError(false)
                     viewModel.updateEmail(it)
                 }
 
@@ -176,6 +183,7 @@ fun SignUpNgo(
                     passwordVisible = passwordVisible,
                     onIconClick = { passwordVisible = !passwordVisible },
                     onValueChange = {
+                        viewModel.updatePasswordError(false)
                         viewModel.updatePassword(it)
                     }
                 )
@@ -191,6 +199,7 @@ fun SignUpNgo(
                     passwordVisible = confirmPasswordVisible,
                     onIconClick = { confirmPasswordVisible = !confirmPasswordVisible },
                     onValueChange = {
+                        viewModel.updateConfirmPassError(false)
                         viewModel.updateConfirmPass(it)
                     }
                 )
@@ -243,6 +252,7 @@ fun SignUpNgo(
                     errorMessage = ngoNameErrorMessage,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                 ) {
+                    viewModel.updateAdminNameError(false)
                     viewModel.updateNgoName(it)
                 }
 
@@ -253,6 +263,7 @@ fun SignUpNgo(
                     error = locationError,
                     errorMessage = locationErrorMessage
                 ) {
+                    viewModel.updateLocationError(false)
                     viewModel.updateLocation(it)
                 }
 
@@ -285,7 +296,11 @@ fun SignUpNgo(
             // create account
             Button(
                 onClick = {
-                          viewModel.signUpAsNgo()
+                    val isDataOk = viewModel.validateSignUpNgoData()
+                    Log.d("sign_up_data", isDataOk.toString())
+                    if (isDataOk) {
+                        viewModel.signUpAsNgo()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -293,14 +308,24 @@ fun SignUpNgo(
             ) {
                 Text(text = "Create Account")
             }
+
         }
         val signUpSuccess by viewModel.signUpSuccess.collectAsState()
         val signInSuccess by viewModel.signInSuccess.collectAsState()
+        val signInToken by viewModel.signInToken.collectAsState()
+        val uid by viewModel.userId.collectAsState()
+        val session = SessionManager(context = context)
         // move to home screen if user successfully signedUp and signedIn
-        if (signUpSuccess && signInSuccess){
+        if (signUpSuccess && signInSuccess) {
+            session.createLoginSession(
+                token = signInToken,
+                email = email,
+                password = password,
+                uid = uid,
+                userType = "ngo"
+            )
             navController.navigate("ngo")
         }
-
     }
 }
 

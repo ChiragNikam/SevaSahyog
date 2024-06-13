@@ -122,7 +122,6 @@ class SignInViewModel : ViewModel() {
             } else {    // if user account selected
                 loginAsUser()
             }
-            _signInProgress.value = false
         }
     }
 
@@ -153,11 +152,13 @@ class SignInViewModel : ViewModel() {
                 } else {
                     Log.i("login_success", "success")
                 }
+                _signInProgress.value = false
             },
             onFailure = { call, t ->
                 t.message?.let { Log.e("login_error", it) }
                 _signInError.value = true
                 _signInErrorMessage.value = t.message.toString()
+                _signInProgress.value = false
             }
         )
     }

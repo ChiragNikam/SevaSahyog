@@ -10,7 +10,7 @@ import com.learn.sevasahyog.auth.repo.AuthRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SignUpNgoViewModel: ViewModel() {
+class SignUpNgoViewModel : ViewModel() {
 
     // admin name
     private val _adminName = MutableStateFlow("");
@@ -187,8 +187,77 @@ class SignUpNgoViewModel: ViewModel() {
     private val _signInSuccess = MutableStateFlow(false)
     val signInSuccess get() = _signInSuccess
 
-    val authRepo = AuthRepo()
-    fun signUpAsNgo(){
+    fun validateSignUpNgoData(): Boolean {
+        var isValid = true
+
+        if (adminName.value.isEmpty()) {
+            _adminNameError.value = true
+            _adminNameErrorMessage.value = "Please enter user-name"
+            isValid = false
+        } else {
+            _adminNameError.value = false
+            _adminNameErrorMessage.value = ""
+        }
+
+        if (phoneNo.value.isEmpty()) {
+            _phoneNoError.value = true
+            _phoneNoErrorMessage.value = "Please enter phone"
+            isValid = false
+        } else {
+            _phoneNoError.value = false
+            _phoneNoErrorMessage.value = ""
+        }
+
+        if (email.value.isEmpty()) {
+            _emailError.value = true
+            _emailErrorMessage.value = "Please enter email"
+            isValid = false
+        } else {
+            _emailError.value = false
+            _emailErrorMessage.value = ""
+        }
+
+        if (password.value.isEmpty()) {
+            _passwordError.value = true
+            _passwordErrorMessage.value = "Please enter password"
+            isValid = false
+        } else {
+            _passwordError.value = false
+            _passwordErrorMessage.value = ""
+        }
+
+        if (ngoName.value.isEmpty()) {
+            _ngoNameError.value = true
+            _ngoNameErrorMessage.value = "Please enter Ngo name"
+            isValid = false
+        } else {
+            _ngoNameError.value = false
+            _ngoNameErrorMessage.value = ""
+        }
+
+        if (location.value.isEmpty()) {
+            _locationError.value = true
+            _locationErrorMessage.value = "Please enter Location"
+            isValid = false
+        } else {
+            _locationError.value = false
+            _locationErrorMessage.value = ""
+        }
+
+        if (password.value != confirmPass.value) {
+            _confirmPassError.value = true
+            _confirmPassErrorMessage.value = "Didn't match with password"
+            isValid = false
+        } else {
+            _confirmPassError.value = false
+            _confirmPassErrorMessage.value = ""
+        }
+
+        return isValid
+    }
+
+    private val authRepo = AuthRepo()
+    fun signUpAsNgo() {
         val signUpData = SignUpRequestNgo(      // create obj for signUp data
             userName = adminName.value,
             mobileNo = phoneNo.value,
@@ -198,23 +267,26 @@ class SignUpNgoViewModel: ViewModel() {
             location = location.value,
             aboutNgo = longDesc.value
         )
-        
+
         authRepo.ngoSignUp(
             signUpData = signUpData,
-            onResponse = {call, response ->  
-                if (response.code() == 200){
+            onResponse = { call, response ->
+                if (response.code() == 200) {
                     val signUpResponse = response.body()
-                    if (signUpResponse != null){
+                    if (signUpResponse != null) {
                         Log.d("sign_up", "success")
                         _signUpSuccess.value = true
                         // after creating account do signIn
                         authRepo.ngoSignIn(
-                            signInData = SignInRequest(email = email.value, password = password.value),
+                            signInData = SignInRequest(
+                                email = email.value,
+                                password = password.value
+                            ),
                             onResponse = { call, signInResponse ->
                                 if (signInResponse.code() == 200) {
                                     _signInSuccess.value = true
                                     val signInResponseData = signInResponse.body()
-                                    if (signInResponseData != null){
+                                    if (signInResponseData != null) {
                                         _signInToken.value = signInResponseData.token
                                         _userId.value = signInResponseData.ngoAccount.userId
                                     }
@@ -239,7 +311,7 @@ class SignUpNgoViewModel: ViewModel() {
                     }
                 }
             },
-            onFailure = {call, t ->
+            onFailure = { call, t ->
                 t.message?.let { Log.e("sign_up_error", it) }
                 _signUpError.value = true
                 _signUpErrorMessage.value = t.message.toString()

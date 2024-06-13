@@ -12,6 +12,7 @@ class SessionManager(context: Context?) {
     private val KEY_EMAIL = "email"
     private val KEY_PASSWORD = "password"
     private val KEY_UID = "uid"
+    private val KEY_USER_TYPE = "ngo"
 
     var pref: SharedPreferences? = null
     var editor: SharedPreferences.Editor? = null
@@ -24,12 +25,13 @@ class SessionManager(context: Context?) {
         editor = pref?.edit()
     }
 
-    fun createLoginSession(token: String?, email: String?, password: String?, uid: String?) {
+    fun createLoginSession(token: String?, email: String?, password: String?, uid: String?, userType: String) {
         editor!!.putBoolean(KEY_IS_LOGGED_IN, true)
         editor!!.putString(KEY_TOKEN, token)
         editor!!.putString(KEY_EMAIL, email)
         editor!!.putString(KEY_PASSWORD, password)
         editor!!.putString(KEY_UID, uid)
+        editor!!.putString(KEY_USER_TYPE, userType)
         editor!!.commit()
     }
 

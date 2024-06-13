@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class SignUpUserViewModel : ViewModel() {
 
     // common Error
-    private val _commonError = MutableStateFlow(true);
+    private val _commonError = MutableStateFlow(false);
     val commonError get() = _commonError.asStateFlow()
 
     private val _commonErrorMessage = MutableStateFlow("Something Went Wrong");
