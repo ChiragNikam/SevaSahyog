@@ -1,4 +1,4 @@
-package com.learn.sevasahyog.data
+package com.learn.sevasahyog.ngo_home.data
 
 import androidx.compose.ui.graphics.painter.Painter
 

@@ -15,7 +15,6 @@ fun NgoBottomNavigation(
 
     NavHost(navController = navHostController, startDestination = "home") {
         composable("home") {
-
             HomeScreen(navController = navHostController)
         }
 

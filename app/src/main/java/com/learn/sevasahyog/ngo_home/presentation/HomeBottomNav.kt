@@ -21,12 +21,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
-import com.learn.sevasahyog.data.BottomNavigationItem
+import com.learn.sevasahyog.ngo_home.data.BottomNavigationItem
+import com.learn.sevasahyog.ngo_home.nav.NgoBottomNavigation
 
 @Composable
 fun HomeBottomNav(
-    navHostController: NavHostController)
-{
+    navHostController: NavHostController
+) {
     val bottomBarItems = listOf(
         BottomNavigationItem(
             title = "Home",
@@ -34,33 +35,40 @@ fun HomeBottomNav(
             selectedIcon = painterResource(id = R.drawable.material_symbols_light_home),
             unselectedIcon = painterResource(id = R.drawable.material_symbols_light_home_outline)
         ),
-
         BottomNavigationItem(
             title = "Event",
             route = "event",
             selectedIcon = painterResource(id = R.drawable.material_symbols_event),
-            unselectedIcon = painterResource(id = R.drawable.material_symbols_event_outline)),
-
+            unselectedIcon = painterResource(id = R.drawable.material_symbols_event_outline)
+        ),
         BottomNavigationItem(
             title = "Profile",
             route = "profile",
             selectedIcon = painterResource(id = R.drawable.iconamoon_profile_fill),
             unselectedIcon = painterResource(id = R.drawable.iconamoon_profile_light)
         )
-
     )
 
-    val bottomNavController= rememberNavController()
+    val bottomNavController = rememberNavController()   // nav controller for bottom navigation screen
 
     Scaffold(bottomBar = {
-       BottomNav(items = bottomBarItems, navController = bottomNavController) {
-           bottomNavController.navigate(it.route)
-       }
-   }) {
-       Surface (modifier = Modifier.padding(it)){
-         //  NgoBottomNavigation(navHostController)
-       }
-   }
+        BottomNav(items = bottomBarItems, navController = bottomNavController) {
+            bottomNavController.navigate(it.route) {
+                // Avoid multiple copies of the same destination when reselecting the same item
+                popUpTo(bottomNavController.graph.startDestinationId) {
+                    saveState = true
+                }
+                // Avoid multiple copies of the same destination when reselecting the same item
+                launchSingleTop = true
+                // Restore state when reselecting a previously selected item
+                restoreState = true
+            }
+        }
+    }) {
+        Surface(modifier = Modifier.padding(it)) {
+            NgoBottomNavigation(bottomNavController)
+        }
+    }
 }
 
 
@@ -88,13 +96,15 @@ fun BottomNav(
                         Text(
                             text = bottomNavigationItem.title,
                             fontWeight = FontWeight(900),
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize
                         )
                     } else {
                         Text(
                             text = bottomNavigationItem.title,
                             fontWeight = FontWeight(700),
-                            color = Color.Gray
+                            color = Color.Gray,
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize
                         )
                     }
                 },

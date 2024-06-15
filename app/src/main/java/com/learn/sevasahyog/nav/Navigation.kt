@@ -12,7 +12,10 @@ import com.learn.sevasahyog.auth.presentation.ChooseAccountType
 import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
+import com.learn.sevasahyog.home_screens.HomeScreen
+import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
+import com.learn.sevasahyog.ngo_home.presentation.ProfileScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -38,6 +41,19 @@ fun AppNavigation(navController: NavHostController) {
         navigation(startDestination = "ngo/bottomNav", route = "ngo") {
             composable(route = "ngo/bottomNav") {
                 HomeBottomNav(navHostController = navController)
+            }
+            navigation(startDestination = "home", route = "bottomNav/items"){
+                composable("home") {
+                    HomeScreen(navController = navController)
+                }
+
+                composable("event") {
+                    EventScreen(navController = navController)
+                }
+
+                composable("profile") {
+                    ProfileScreen(navController = navController)
+                }
             }
         }
     }
