@@ -1,4 +1,4 @@
-package com.learn.sevasahyog
+package com.learn.sevasahyog.ngo_home.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

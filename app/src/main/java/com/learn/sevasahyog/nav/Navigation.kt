@@ -2,6 +2,7 @@ package com.learn.sevasahyog.nav
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +19,7 @@ fun AppNavigation(navController: NavHostController) {
     val context = LocalContext.current
     NavHost(
         navController = navController,
-        startDestination = "auth"
+        startDestination = "ngo"
     ) {
         navigation(startDestination = "auth/signIn", route = "auth") {
             composable(route = "auth/signIn") {
@@ -36,7 +37,7 @@ fun AppNavigation(navController: NavHostController) {
         }
         navigation(startDestination = "ngo/bottomNav", route = "ngo") {
             composable(route = "ngo/bottomNav") {
-                HomeBottomNav(navController = navController)
+                HomeBottomNav(navHostController = navController)
             }
         }
     }
