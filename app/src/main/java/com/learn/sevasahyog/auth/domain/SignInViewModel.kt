@@ -141,6 +141,7 @@ class SignInViewModel : ViewModel() {
                         _signInToken.value = signInResponse.token
                         _userId.value = signInResponse.ngoAccount.userId
                     }
+                    Log.i("login_success", "success")
                 } else if (response.code() == 409) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody.let {
@@ -149,10 +150,9 @@ class SignInViewModel : ViewModel() {
                     _signInError.value = true
                     _signInErrorMessage.value = errorResponse.errorMessage
                     Log.e("login_error", errorResponse.errorMessage)
-                } else {
-                    Log.i("login_success", "success")
                 }
                 _signInProgress.value = false
+                Log.d("code", response.code().toString())
             },
             onFailure = { call, t ->
                 t.message?.let { Log.e("login_error", it) }

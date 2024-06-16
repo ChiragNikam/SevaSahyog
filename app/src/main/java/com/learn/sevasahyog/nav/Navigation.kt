@@ -22,7 +22,7 @@ fun AppNavigation(navController: NavHostController) {
     val context = LocalContext.current
     NavHost(
         navController = navController,
-        startDestination = "ngo"
+        startDestination = "auth"
     ) {
         navigation(startDestination = "auth/signIn", route = "auth") {
             composable(route = "auth/signIn") {
@@ -41,19 +41,6 @@ fun AppNavigation(navController: NavHostController) {
         navigation(startDestination = "ngo/bottomNav", route = "ngo") {
             composable(route = "ngo/bottomNav") {
                 HomeBottomNav(navHostController = navController)
-            }
-            navigation(startDestination = "home", route = "bottomNav/items"){
-                composable("home") {
-                    HomeScreen(navController = navController)
-                }
-
-                composable("event") {
-                    EventScreen(navController = navController)
-                }
-
-                composable("profile") {
-                    ProfileScreen(navController = navController)
-                }
             }
         }
     }

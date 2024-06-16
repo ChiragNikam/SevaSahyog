@@ -14,7 +14,7 @@ import retrofit2.Response
 
 class AuthRepo {
     val authService =
-        RetrofitInstance.getClient("http://192.168.1.14:8080").create(AuthService::class.java)
+        RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/").create(AuthService::class.java)
 
     fun ngoSignIn(
         signInData: SignInRequest,

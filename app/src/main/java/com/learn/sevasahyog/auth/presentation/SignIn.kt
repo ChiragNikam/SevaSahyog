@@ -307,7 +307,7 @@ fun SignIn(
     val userAccountSelected by viewModel.userAccount.collectAsState()
     val uid by viewModel.userId.collectAsState()
     if (ngoSignInSuccess) {
-        val session = SessionManager(context)
+//        val sessionLogin = SessionManager(context)
         session.createLoginSession(
             token = signInToken,
             email = email,
