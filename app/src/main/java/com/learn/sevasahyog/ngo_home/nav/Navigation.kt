@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.ProfileScreen
-import com.learn.sevasahyog.home_screens.HomeScreen
+import com.learn.sevasahyog.ngo_home.presentation.HomeScreen
 
 @Composable
 fun NgoBottomNavigation(
