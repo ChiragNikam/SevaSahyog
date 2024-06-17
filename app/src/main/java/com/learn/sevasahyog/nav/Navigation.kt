@@ -10,14 +10,15 @@ import com.learn.sevasahyog.auth.presentation.ChooseAccountType
 import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
+import com.learn.sevasahyog.ngo_home.presentation.CreateEvent
+import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
-    val context = LocalContext.current
     NavHost(
         navController = navController,
-        startDestination = "auth"
+        startDestination = "ngo"
     ) {
         navigation(startDestination = "auth/signIn", route = "auth") {
             composable(route = "auth/signIn") {
@@ -37,6 +38,16 @@ fun AppNavigation(navController: NavHostController) {
             composable(route = "ngo/bottomNav") {
                 HomeBottomNav(navHostController = navController)
             }
+            navigation(startDestination = "ngo/eventScreen", route = "event_screen"){
+                composable(route="ngo/event_screen"){
+                   EventScreen(navController = navController)
+                }
+                composable(route="ngo/create_event"){
+                   CreateEvent()
+                }
+            }
+
+
         }
     }
 }
