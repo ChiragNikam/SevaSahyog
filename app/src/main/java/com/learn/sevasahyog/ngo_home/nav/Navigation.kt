@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
+import com.learn.sevasahyog.ngo_home.presentation.CreateEvent
 import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.ProfileScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeScreen
@@ -21,6 +23,15 @@ fun NgoBottomNavigation(
         composable("event") {
             EventScreen(navController = navHostController)
         }
+        navigation(startDestination = "event/eventScreen", route = "event_screen"){
+            composable(route="event/eventScreen"){
+                EventScreen(navController = navHostController)
+            }
+            composable(route="event/createEventScreen"){
+                CreateEvent()
+            }
+        }
+
 
         composable("profile") {
             ProfileScreen(navController = navHostController)

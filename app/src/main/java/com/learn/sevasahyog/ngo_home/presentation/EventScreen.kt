@@ -6,6 +6,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,87 +45,87 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun EventScreen(navController: NavController){
-    Surface(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())
-        .background(MaterialTheme.colorScheme.background)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "Events",
-                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                fontWeight = FontWeight(700)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(text = "Upcoming Events")
-
-            Row(modifier = Modifier
-                .fillMaxSize()
-                .horizontalScroll(rememberScrollState())
-                .padding(8.dp)
-            ) {
-
-                UpcomingEvent(
-                    eventName = "Office Meeting",
-                    leadBy = "Rajat kr",
-                    dateOfEvent = "12/08/2024"
-                    )
-                Spacer(modifier = Modifier.width(8.dp))
-                UpcomingEvent(
-                    eventName = "Fruits distribution",
-                    leadBy = "Mohan",
-                    dateOfEvent = "19/08/2024"
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                UpcomingEvent(
-                    eventName = "awareness scheme",
-                    leadBy = "Chirag",
-                    dateOfEvent = "10/02/2024"
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(text = "Past Events")
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-                ){
-                PastEvent(eventYear = "2024", onClick = {
-                })
-                PastEvent(eventYear = "2023", onClick = {}) }
-            Spacer(modifier = Modifier.height(18.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                PastEvent(eventYear = "2022", onClick = { /* Handle click event */ })
-                PastEvent(eventYear = "2021", onClick = { /* Handle click event */ })
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
+fun EventScreen(navController: NavController) {
+    Scaffold (
+        floatingActionButton = {
             FloatingActionButton(
-
                 onClick = {
-                          navController.navigate("create_event")
+                    navController.navigate("event/createEventScreen")
                 },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .align(Alignment.End),
-                containerColor = Color(0xFF5FAA14)
             ) {
-                Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Add Event")
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Event", tint = MaterialTheme.colorScheme.primary)
             }
+        }
+    ){
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
+            ) {
+                Text(
+                    text = "Events",
+                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                    fontWeight = FontWeight(700)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = "Upcoming Events")
 
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(8.dp)
+                ) {
 
+                    UpcomingEvent(
+                        eventName = "Office Meeting",
+                        leadBy = "Rajat kr",
+                        dateOfEvent = "12/08/2024"
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    UpcomingEvent(
+                        eventName = "Fruits distribution",
+                        leadBy = "Mohan",
+                        dateOfEvent = "19/08/2024"
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    UpcomingEvent(
+                        eventName = "awareness scheme",
+                        leadBy = "Chirag",
+                        dateOfEvent = "10/02/2024"
+                    )
+                }
 
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = "Past Events")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 128.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(8){
+                        PastEvent(eventYear = "2024", onClick = {})
+                    }
+                }
+                Spacer(modifier = Modifier.height(18.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    PastEvent(eventYear = "2022", onClick = { /* Handle click event */ })
+                    PastEvent(eventYear = "2021", onClick = { /* Handle click event */ })
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
 
@@ -177,7 +181,7 @@ fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String) {
 }
 
 @Composable
-fun PastEvent(eventYear: String,onClick: () -> Unit) {
+fun PastEvent(eventYear: String, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(120.dp)
@@ -189,7 +193,7 @@ fun PastEvent(eventYear: String,onClick: () -> Unit) {
     ) {
         Column(
             modifier = Modifier
-                .padding(top = 16.dp , bottom = 14.dp, start = 10.dp , end = 8.dp )
+                .padding(top = 16.dp, bottom = 14.dp, start = 10.dp, end = 8.dp)
         ) {
             Text(
                 text = eventYear,
@@ -199,7 +203,8 @@ fun PastEvent(eventYear: String,onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "View Events",
+            Text(
+                text = "View Events",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 fontWeight = FontWeight.Normal
             )
@@ -207,9 +212,10 @@ fun PastEvent(eventYear: String,onClick: () -> Unit) {
         }
     }
 }
+
 @Preview
 @Composable
 private fun PreviewEventScreen() {
     EventScreen(navController = rememberNavController())
-    
+
 }

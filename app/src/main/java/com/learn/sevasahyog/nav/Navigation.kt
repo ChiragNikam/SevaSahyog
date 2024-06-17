@@ -38,14 +38,6 @@ fun AppNavigation(navController: NavHostController) {
             composable(route = "ngo/bottomNav") {
                 HomeBottomNav(navHostController = navController)
             }
-            navigation(startDestination = "ngo/eventScreen", route = "event_screen"){
-                composable(route="ngo/event_screen"){
-                   EventScreen(navController = navController)
-                }
-                composable(route="ngo/create_event"){
-                   CreateEvent()
-                }
-            }
 
 
         }
