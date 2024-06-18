@@ -68,25 +68,30 @@ fun ProfileScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(70.dp))
 
-            userInfoCard(userName ="Chirag Nikam" , userMobile ="7004173227" , userEmail ="chiragnikam01@gmail.com")
+            userInfoCard(
+                userName = "Chirag Nikam",
+                userMobile = "7004173227",
+                userEmail = "chiragnikam01@gmail.com"
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
-            NgoInfoCard(ngoName = "SevaSahyog Ngo", ngoLocation = "Nagpur ,Maharashtra", aboutNgo ="This section is about Ngo.It will have short description and " +
-                    "and the moto of the Ngo." , ngoDescription ="It is a long established fact that a reader" +
-                    "will be distracted by readable content of page when there is no hope of " +
-                    "meaning for the words." )
+            NgoInfoCard(
+                ngoName = "SevaSahyog Ngo",
+                ngoLocation = "Nagpur ,Maharashtra",
+                aboutNgo = "This section is about Ngo.It will have short description and " +
+                        "and the moto of the Ngo.",
+                ngoDescription = "It is a long established fact that a reader" +
+                        "will be distracted by readable content of page when there is no hope of " +
+                        "meaning for the words."
+            )
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = { /* Handle save action */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.White
-                ),
                 modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.CenterHorizontally),
-                ) {
+            ) {
                 Text("Logout", fontSize = 16.sp)
             }
         }
@@ -98,28 +103,27 @@ fun UserProfileImage() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF64B5F6),
-                        Color(0xFF42A5F5)
-                    )
-                )
-            )
+            .height(220.dp)
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_background),
             contentDescription = "Cover image",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .padding(bottom = 70.dp)
+                .fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        IconButton(onClick = { /*TODO*/ },
+        IconButton(
+            onClick = { /*TODO*/ },
             modifier = Modifier
+                .padding(bottom = 30.dp)
                 .align(Alignment.BottomEnd)
-
         ) {
-            Icon(imageVector = Icons.Default.Edit, contentDescription ="edit" , modifier = Modifier.size(32.dp) )
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "edit",
+                modifier = Modifier.size(32.dp)
+            )
         }
         Box(
             modifier = Modifier
@@ -128,9 +132,10 @@ fun UserProfileImage() {
         ) {
             Box(
                 modifier = Modifier
-                    .size(130.dp)
+                    .size(140.dp)
                     .clip(CircleShape)
-                    .offset(y = 60.dp)  // Adjust offset to position profile image correctly
+                    .background(Color.LightGray)
+//                    .offset(y = 60.dp)  // Adjust offset to position profile image correctly
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.iconamoon_profile_fill),
@@ -138,7 +143,7 @@ fun UserProfileImage() {
                     modifier = Modifier
                         .size(130.dp)
                         .clip(CircleShape)
-                        .align(Alignment.Center)
+                        .align(Alignment.Center),
                 )
                 IconButton(
                     onClick = { /* Add icon click handler */ },
@@ -146,12 +151,13 @@ fun UserProfileImage() {
                         .align(Alignment.BottomEnd)
                         .offset(x = (-10).dp, y = (-10).dp)
                         .size(36.dp)
-                        .background(MaterialTheme.colorScheme.background, CircleShape)
+//                        .background(MaterialTheme.colorScheme.background, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.AddCircle,
                         contentDescription = "Add icon",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -166,38 +172,49 @@ fun userInfoCard(userName: String, userMobile: String, userEmail: String) {
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardColors(
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            disabledContentColor = Color.White,
+            disabledContainerColor = Color.White
+        )
     ) {
         Column(
             modifier = Modifier
-                .background(Color(0xFFF9FFF3))
                 .padding(16.dp)
         ) {
-            Row(modifier = Modifier.fillMaxSize()) {
-                Text(text = "User Info",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = userName,
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.Black,
+                text = "User Info",
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = userName,
+                fontSize = 18.sp
+            )
+            Text(text = "User Name", style = MaterialTheme.typography.labelSmall)
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
                 text = userMobile,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(top = 4.dp)
             )
+            Text(text = "Mobile", style = MaterialTheme.typography.labelSmall)
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             Text(
                 text = userEmail,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+                fontWeight = FontWeight.Medium
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Text(text = "Email", style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -231,7 +248,7 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
             Spacer(modifier = Modifier.height(6.dp))
             InfoRow(
                 text = ngoLocation,
-             imageVector = Icons.Default.Place
+                imageVector = Icons.Default.Place
             )
             Spacer(modifier = Modifier.height(6.dp))
             ExpandableInfoRow(
@@ -246,7 +263,7 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
                 text = ngoDescription,
                 expanded = isNgoDescriptionExpanded,
                 onToggleExpand = { isNgoDescriptionExpanded = !isNgoDescriptionExpanded },
-              imageVector = Icons.Default.List
+                imageVector = Icons.Default.List
             )
         }
     }
@@ -256,27 +273,31 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
 fun InfoRow(text: String, imageVector: ImageVector) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            imageVector=imageVector,
-            contentDescription =null,
+            imageVector = imageVector,
+            contentDescription = null,
             modifier = Modifier.size(22.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = text,
-            fontSize = 16.sp
-            ,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
     }
 }
 
 @Composable
-fun ExpandableInfoRow(text: String, expanded: Boolean, onToggleExpand: () -> Unit, imageVector: ImageVector) {
+fun ExpandableInfoRow(
+    text: String,
+    expanded: Boolean,
+    onToggleExpand: () -> Unit,
+    imageVector: ImageVector
+) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector=imageVector,
-                contentDescription =null,
+                imageVector = imageVector,
+                contentDescription = null,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
