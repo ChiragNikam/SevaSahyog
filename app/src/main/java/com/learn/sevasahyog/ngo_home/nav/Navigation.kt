@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.learn.sevasahyog.ngo_home.presentation.CreateEvent
+import com.learn.sevasahyog.ngo_home.presentation.EventDetailScreen
 import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.ProfileScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeScreen
@@ -29,6 +30,9 @@ fun NgoBottomNavigation(
             }
             composable(route="event/createEventScreen"){
                 CreateEvent()
+            }
+            composable(route="event/eventDetailScreen"){
+                EventDetailScreen()
             }
         }
 

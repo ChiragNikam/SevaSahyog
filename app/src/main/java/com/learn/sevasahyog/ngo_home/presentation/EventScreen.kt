@@ -112,7 +112,9 @@ fun EventScreen(navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(8){
-                        PastEvent(eventYear = "2024", onClick = {})
+                        PastEvent(eventYear = "2024", onClick = {
+                            navController.navigate("event/eventDetailScreen")
+                        })
                     }
                 }
                 Spacer(modifier = Modifier.height(18.dp))
