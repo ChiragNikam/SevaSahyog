@@ -57,9 +57,10 @@ fun HomeScreen(navController: NavController) {
                 eventName = "Event Name",
                 byName = "by Name",
                 location = "Location",
-                description = "Techweek curates exciting programming that allows a global spotlight to shine on each ecosystem and its leaders. Past speakers include Rahm Emanuel, Travis Kalanick (CEO, Uber), Craig Newmark (Founder, Craigslist)," +
+                description = "Techweek curates exciting programming that allows a global spotlight " +
+                        "to shine on each ecosystem and its leaders. Past speakers include Rahm Emanuel, " +
+                        "Travis Kalanick (CEO, Uber), Craig Newmark (Founder, Craigslist)," +
                         " Barney Harford (CEO, Orbitz), and Chuck Templeton (Founder, OpenTable)")
-
         }
     }
 

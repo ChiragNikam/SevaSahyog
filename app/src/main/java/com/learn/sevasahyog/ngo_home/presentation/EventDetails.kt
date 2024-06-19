@@ -1,5 +1,6 @@
 package com.learn.sevasahyog.ngo_home.presentation
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
@@ -30,10 +32,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,14 +46,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
 fun EventDetailScreen(){
@@ -80,7 +87,7 @@ fun EventDetailScreen(){
                 eventLocation ="Manavada ,Nagpur" ,
                 eventOrganizer = "Chirag Nikam",
                 leadMobile = "+91 7878900324",
-                eventLongDescription ="This section is about Ngo.It will have short description and " + "and the moto of the Ngo, ngoDescription. It is a long established fact that a reader +" +
+                eventLongDescription ="This section is about Ngo.It will have short description and " + "and the moto of the Ngo, ngoDescription. It is a long established fact that a reader " +
                         "will be distracted by readable content of page when there is no hope of " +
                         "meaning for the words."
             )
@@ -238,19 +245,14 @@ fun StatusCard() {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     EventStatus(isLive = true)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = { /* Handle save action */ },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red,
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier.align(Alignment.CenterVertically) // Aligns the button vertically with other items in the row
+                    Spacer(modifier = Modifier.weight(1f))
+                    OutlinedButton(
+                        onClick = { },
                     ) {
-                        Text("Update", fontSize = 16.sp)
+                        Text("Update")
                     }
-                }
 
+                }
             }
 
             }
@@ -262,7 +264,6 @@ fun StatusCard() {
 fun EventStatus(isLive: Boolean) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
             .padding(16.dp)
     ) {
         Row(
@@ -286,30 +287,77 @@ fun EventStatus(isLive: Boolean) {
 
 @Composable
 fun UploadImageBox() {
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri?>(null)}
+//    val imagePickerLauncher= Lau
+
+
+
     Box(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(14.dp)
             .fillMaxSize()
-            .background(Color.LightGray)
-            .clickable { /* Handle click for upload image */ },
-        contentAlignment = Alignment.Center
+            .background(Color.White)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Start),
+                horizontalArrangement = Arrangement.Center
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.bi_image),
+                    contentDescription = "icons",
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(28.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(text = "Upload Image",
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(top = 12.dp),
+                    textAlign = TextAlign.Center
+                    )
+                Spacer(modifier = Modifier.padding(60.dp))
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    modifier = Modifier
+                        .padding(top = 12.dp, end = 6.dp)
+                        .fillMaxWidth()
+                        .clickable {
+                            // Handle click action here
+                        },
+                    contentDescription = "upload Image Icon",)
+
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+
             Icon(
                 painter = painterResource(id = R.drawable.bi_image),
                 contentDescription = "Upload Image",
                 tint = Color.Black
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Upload Image", fontSize = 12.sp)
+
+
         }
     }
 }
 
-
+@Preview
+@Composable
+private fun PreviewUploadImageBox() {
+    SevaSahyogTheme {
+        UploadImageBox()
+    }
+}
 
 @Preview
 @Composable
 private fun PreviewEventDetailScreen() {
-    EventDetailScreen()
+    SevaSahyogTheme {
+        EventDetailScreen()
+    }
+
 }

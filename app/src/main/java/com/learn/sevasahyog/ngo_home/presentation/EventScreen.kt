@@ -66,7 +66,7 @@ fun EventScreen(navController: NavController) {
                 .background(MaterialTheme.colorScheme.background)
         ) {
             Column(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                modifier = Modifier.padding(start = 10.dp, end = 16.dp, top = 16.dp)
             ) {
                 Text(
                     text = "Events",
@@ -111,21 +111,13 @@ fun EventScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(8){
+                    items(6){
                         PastEvent(eventYear = "2024", onClick = {
                             navController.navigate("event/eventDetailScreen")
                         })
                     }
                 }
                 Spacer(modifier = Modifier.height(18.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    PastEvent(eventYear = "2022", onClick = { /* Handle click event */ })
-                    PastEvent(eventYear = "2021", onClick = { /* Handle click event */ })
-                }
-
                 Spacer(modifier = Modifier.weight(1f))
             }
         }

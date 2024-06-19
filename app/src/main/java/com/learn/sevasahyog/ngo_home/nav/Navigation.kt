@@ -36,7 +36,6 @@ fun NgoBottomNavigation(
             }
         }
 
-
         composable("profile") {
             ProfileScreen(navController = navHostController)
         }
