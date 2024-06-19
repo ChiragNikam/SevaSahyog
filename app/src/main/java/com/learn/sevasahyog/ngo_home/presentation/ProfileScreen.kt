@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,9 +54,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.common.DataViewInCard
+import com.learn.sevasahyog.ngo_home.domain.ProfileViewModel
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    viewModel: ProfileViewModel= androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -82,26 +87,31 @@ fun ProfileScreen(navController: NavController) {
             )
 
             Spacer(modifier = Modifier.height(70.dp))
-
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             ) {
-                userInfoCard(
-                    userName = "Chirag Nikam",
-                    userMobile = "7004173227",
-                    userEmail = "chiragnikam01@gmail.com"
+                val userName by viewModel.userName.collectAsState()
+                val userEmail by viewModel.email.collectAsState()
+                val userMobile by viewModel.phoneNumber.collectAsState()
+
+                UserInfoCard(
+                    userName = userName,
+                    userMobile = userMobile,
+                    userEmail = userEmail
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val ngoName by viewModel.ngoName.collectAsState()
+                val ngoLocation by viewModel.ngoName.collectAsState()
+                val ngoInfo by viewModel.ngoInfo.collectAsState()
+                val ngoLongDescription by viewModel.ngoLongDescription.collectAsState()
+
                 NgoInfoCard(
-                    ngoName = "SevaSahyog Ngo",
-                    ngoLocation = "Nagpur ,Maharashtra",
-                    aboutNgo = "This section is about Ngo.It will have short description and " +
-                            "and the moto of the Ngo.",
-                    ngoDescription = "It is a long established fact that a reader" +
-                            "will be distracted by readable content of page when there is no hope of " +
-                            "meaning for the words."
+                    ngoName = ngoName,
+                    ngoLocation = ngoLocation,
+                    aboutNgo = ngoInfo,
+                    ngoDescription = ngoLongDescription
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -197,7 +207,7 @@ fun UserProfileImage(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun userInfoCard(userName: String, userMobile: String, userEmail: String) {
+fun UserInfoCard(userName: String, userMobile: String, userEmail: String) {
     Card(
         modifier = Modifier
             .fillMaxSize()
@@ -294,23 +304,6 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
                 imageVector = Icons.AutoMirrored.Filled.List
             )
         }
-    }
-}
-
-@Composable
-fun InfoRow(text: String, imageVector: ImageVector) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null,
-            modifier = Modifier.size(22.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
 

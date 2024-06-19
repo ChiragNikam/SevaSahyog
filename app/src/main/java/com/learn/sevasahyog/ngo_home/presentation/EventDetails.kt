@@ -1,6 +1,9 @@
 package com.learn.sevasahyog.ngo_home.presentation
 
+import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -45,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -124,10 +129,6 @@ fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eve
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            EventTextInfo(
-                text = eventName,
-                imageVector = Icons.Default.AccountBox
-            )
             Spacer(modifier = Modifier.height(10.dp))
             EventTextInfo(
                 text = eventDate,
@@ -275,7 +276,7 @@ fun EventStatus(isLive: Boolean) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ellipse_5), // Replace with your icon resource
+                imageVector = ImageVector.vectorResource(id = R.drawable.ellipse_5),
                 contentDescription = null,
                 tint = if (isLive) Color.Green else Color.Red
             )
@@ -288,8 +289,14 @@ fun EventStatus(isLive: Boolean) {
 @Composable
 fun UploadImageBox() {
     val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null)}
-//    val imagePickerLauncher= Lau
+    var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val imagePickerLauncher= rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()) {
+            uris: List<Uri> ->
+        if (uris.isNotEmpty()) {
+            imageUris = uris
+        }
+    }
 
 
 
@@ -327,19 +334,36 @@ fun UploadImageBox() {
                         .padding(top = 12.dp, end = 6.dp)
                         .fillMaxWidth()
                         .clickable {
-                            // Handle click action here
+                            imagePickerLauncher.launch("image/*")
                         },
                     contentDescription = "upload Image Icon",)
-
             }
             Spacer(modifier = Modifier.height(10.dp))
 
-            Icon(
+            if (imageUris.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(imageUris.size) { index ->
+                        val uri = imageUris[index]
+                        val inputStream = context.contentResolver.openInputStream(uri)
+                        val bitmap = BitmapFactory.decodeStream(inputStream)
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .background(Color.White)
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            } else Icon(
                 painter = painterResource(id = R.drawable.bi_image),
                 contentDescription = "Upload Image",
                 tint = Color.Black
             )
-
 
         }
     }
