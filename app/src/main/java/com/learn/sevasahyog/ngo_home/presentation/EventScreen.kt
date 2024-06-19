@@ -40,6 +40,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -70,11 +71,11 @@ fun EventScreen(navController: NavController) {
             ) {
                 Text(
                     text = "Events",
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight(700)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = "Upcoming Events")
+                Text(text = "UPCOMING EVENTS", style = MaterialTheme.typography.labelLarge, letterSpacing = MaterialTheme.typography.labelMedium.letterSpacing)
 
                 Row(
                     modifier = Modifier
@@ -102,7 +103,8 @@ fun EventScreen(navController: NavController) {
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = "Past Events")
+
+                Text(text = "PAST EVENTS", style = MaterialTheme.typography.labelLarge, letterSpacing = MaterialTheme.typography.labelMedium.letterSpacing)
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -111,14 +113,12 @@ fun EventScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(6){
+                    items(8){
                         PastEvent(eventYear = "2024", onClick = {
                             navController.navigate("event/eventDetailScreen")
                         })
                     }
                 }
-                Spacer(modifier = Modifier.height(18.dp))
-                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
