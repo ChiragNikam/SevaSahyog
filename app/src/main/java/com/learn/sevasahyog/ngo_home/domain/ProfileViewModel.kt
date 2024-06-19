@@ -1,4 +1,7 @@
 package com.learn.sevasahyog.ngo_home.domain
 
-class ProfileViewModel {
+import androidx.lifecycle.ViewModel
+
+class ProfileViewModel: ViewModel() {
+
 }
