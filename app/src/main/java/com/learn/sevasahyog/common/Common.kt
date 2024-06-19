@@ -65,8 +65,8 @@ fun CardInfoView(
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardColors(
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            containerColor = MaterialTheme.colorScheme.background,
             disabledContentColor = Color.White,
             disabledContainerColor = Color.White
         )
