@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,13 +52,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
-import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
-import com.learn.sevasahyog.ngo_home.domain.ProfileViewModel
-import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun ProfileScreen(navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -91,55 +87,22 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = an
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             ) {
-                val userName by viewModel.userName.collectAsState()
-                // User Info Card
-                CardInfoView(label = "User Info") {
-                    DataViewInCard(info = userName, infoDesc = "User Name", image = Icons.Filled.Face)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    DataViewInCard(info = "userMobile", infoDesc = "Mobile", image = Icons.Filled.Phone)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    DataViewInCard(info = "userEmail", infoDesc = "E-mail", image = Icons.Filled.Email)
-                }
-
+                userInfoCard(
+                    userName = "Chirag Nikam",
+                    userMobile = "7004173227",
+                    userEmail = "chiragnikam01@gmail.com"
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ngo info card
-                var isAboutNgoExpanded by remember { mutableStateOf(false) }
-                var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
-                CardInfoView(label = "Ngo Info ") {
-                    DataViewInCard(info = "ngoName", infoDesc = "Ngo Name", image = Icons.Filled.Home)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    DataViewInCard(
-                        info = "ngoLocation",
-                        infoDesc = "Location",
-                        image = Icons.Filled.LocationOn
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    ExpandableInfoRow(
-                        text = "aboutNgo",
-                        expanded = isAboutNgoExpanded,
-                        onToggleExpand = { isAboutNgoExpanded = !isAboutNgoExpanded },
-                        imageVector = Icons.Default.Info
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    ExpandableInfoRow(
-                        text = "ngoDescription",
-                        expanded = isNgoDescriptionExpanded,
-                        onToggleExpand = { isNgoDescriptionExpanded = !isNgoDescriptionExpanded },
-                        imageVector = Icons.AutoMirrored.Filled.List
-                    )
-                }
-
+                NgoInfoCard(
+                    ngoName = "SevaSahyog Ngo",
+                    ngoLocation = "Nagpur ,Maharashtra",
+                    aboutNgo = "This section is about Ngo.It will have short description and " +
+                            "and the moto of the Ngo.",
+                    ngoDescription = "It is a long established fact that a reader" +
+                            "will be distracted by readable content of page when there is no hope of " +
+                            "meaning for the words."
+                )
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
@@ -232,6 +195,47 @@ fun UserProfileImage(modifier: Modifier = Modifier) {
     }
 }
 
+
+@Composable
+fun userInfoCard(userName: String, userMobile: String, userEmail: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardColors(
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            disabledContentColor = Color.White,
+            disabledContainerColor = Color.White
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "User Info",
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            DataViewInCard(info = userName, infoDesc = "User Name", image = Icons.Filled.Face)
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            DataViewInCard(info = userMobile, infoDesc = "Mobile", image = Icons.Filled.Phone)
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            DataViewInCard(info = userEmail, infoDesc = "E-mail", image = Icons.Filled.Email)
+        }
+    }
+}
+
 @Composable
 fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescription: String) {
     var isAboutNgoExpanded by remember { mutableStateOf(false) }
@@ -244,7 +248,7 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardColors(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
             disabledContentColor = Color.White,
             disabledContainerColor = Color.White
         )
@@ -262,7 +266,33 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            DataViewInCard(info = ngoName, infoDesc = "Ngo Name", image = Icons.Filled.Home)
 
+            Spacer(modifier = Modifier.height(12.dp))
+
+            DataViewInCard(
+                info = ngoLocation,
+                infoDesc = "Location",
+                image = Icons.Filled.LocationOn
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            ExpandableInfoRow(
+                text = aboutNgo,
+                expanded = isAboutNgoExpanded,
+                onToggleExpand = { isAboutNgoExpanded = !isAboutNgoExpanded },
+                imageVector = Icons.Default.Info
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            ExpandableInfoRow(
+                text = ngoDescription,
+                expanded = isNgoDescriptionExpanded,
+                onToggleExpand = { isNgoDescriptionExpanded = !isNgoDescriptionExpanded },
+                imageVector = Icons.AutoMirrored.Filled.List
+            )
         }
     }
 }
@@ -308,8 +338,8 @@ fun ExpandableInfoRow(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
                     .clickable(onClick = onToggleExpand),
-                maxLines = if (expanded) 2 else 12,
-                overflow = TextOverflow.Ellipsis
+                maxLines = 2,
+                overflow = TextOverflow.Visible
             )
         }
         if (text.length > 100) {
@@ -329,7 +359,5 @@ fun ExpandableInfoRow(
 @Preview
 @Composable
 private fun PreviewProfileScreen() {
-    SevaSahyogTheme {
-        ProfileScreen(navController = rememberNavController())
-    }
+    ProfileScreen(navController = rememberNavController())
 }
