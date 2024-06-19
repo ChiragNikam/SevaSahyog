@@ -56,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
@@ -124,21 +125,21 @@ fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eve
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            EventTextInfo(
-                text = eventName,
-                imageVector = Icons.Default.AccountBox
-            )
+            DataViewInCard(info = eventName, infoDesc = "Event Name", image = Icons.Default.AccountBox)
+
             Spacer(modifier = Modifier.height(10.dp))
-            EventTextInfo(
-                text = eventDate,
-                imageVector = Icons.Default.DateRange
-            )
+
+            DataViewInCard(info = eventDate, infoDesc = "Date", image = Icons.Default.DateRange)
+
             Spacer(modifier = Modifier.height(10.dp))
+
             EventTextInfo(
                 text = eventLocation,
                 imageVector = Icons.Default.Place
             )
+
             Spacer(modifier = Modifier.height(10.dp))
+
             EventTextInfo(
                 text = eventOrganizer,
                 imageVector = Icons.Default.Person

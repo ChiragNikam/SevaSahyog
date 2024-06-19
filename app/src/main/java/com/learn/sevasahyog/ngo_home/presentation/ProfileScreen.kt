@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,9 +54,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.common.DataViewInCard
+import com.learn.sevasahyog.ngo_home.domain.ProfileViewModel
+import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -87,8 +90,9 @@ fun ProfileScreen(navController: NavController) {
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             ) {
+                val userName by viewModel.userName.collectAsState()
                 userInfoCard(
-                    userName = "Chirag Nikam",
+                    userName = userName,
                     userMobile = "7004173227",
                     userEmail = "chiragnikam01@gmail.com"
                 )
@@ -205,7 +209,7 @@ fun userInfoCard(userName: String, userMobile: String, userEmail: String) {
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardColors(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             disabledContentColor = Color.White,
             disabledContainerColor = Color.White
         )
@@ -248,7 +252,7 @@ fun NgoInfoCard(ngoName: String, ngoLocation: String, aboutNgo: String, ngoDescr
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardColors(
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             disabledContentColor = Color.White,
             disabledContainerColor = Color.White
         )
@@ -338,8 +342,8 @@ fun ExpandableInfoRow(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
                     .clickable(onClick = onToggleExpand),
-                maxLines = 2,
-                overflow = TextOverflow.Visible
+                maxLines = if (expanded) 2 else 12,
+                overflow = TextOverflow.Ellipsis
             )
         }
         if (text.length > 100) {
@@ -359,5 +363,7 @@ fun ExpandableInfoRow(
 @Preview
 @Composable
 private fun PreviewProfileScreen() {
-    ProfileScreen(navController = rememberNavController())
+    SevaSahyogTheme {
+        ProfileScreen(navController = rememberNavController())
+    }
 }
