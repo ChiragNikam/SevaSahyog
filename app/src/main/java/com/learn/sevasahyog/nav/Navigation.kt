@@ -1,5 +1,10 @@
 package com.learn.sevasahyog.nav
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -11,11 +16,20 @@ import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
 import com.learn.sevasahyog.ngo_home.presentation.CreateEvent
+import com.learn.sevasahyog.ngo_home.presentation.EventDetailScreen
 import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
+    val inHorizontal = slideInHorizontally(
+        initialOffsetX = { fullWidth -> fullWidth },
+        animationSpec = tween(durationMillis = 300)
+    )
+    val outHorizontal = slideOutHorizontally(
+        targetOffsetX = { fullWidth -> fullWidth },
+        animationSpec = tween(durationMillis = 300)
+    )
     NavHost(
         navController = navController,
         startDestination = "ngo"
@@ -38,8 +52,25 @@ fun AppNavigation(navController: NavHostController) {
             composable(route = "ngo/bottomNav") {
                 HomeBottomNav(navHostController = navController)
             }
-
-
+            navigation(
+                startDestination = "event/eventScreen",
+                route = "event_screen",
+            ) {
+                composable(
+                    route = "event/createEventScreen",
+                    enterTransition = { inHorizontal },
+                    popExitTransition = { outHorizontal }
+                ) {
+                    CreateEvent()
+                }
+                composable(
+                    route = "event/eventDetailScreen",
+                    enterTransition = { inHorizontal },
+                    popExitTransition = { outHorizontal }
+                ) {
+                    EventDetailScreen(navController = navController)
+                }
+            }
         }
     }
 }

@@ -20,10 +20,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
@@ -35,6 +39,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -60,12 +65,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun EventDetailScreen(){
+fun EventDetailScreen(navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -77,29 +84,49 @@ fun EventDetailScreen(){
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Event's Detail",
-                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                fontWeight = FontWeight(700)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "back"
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Event's Detail",
+                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                    fontWeight = FontWeight(700)
+                )
+            }
+            Image(
+                painter = painterResource(id = R.drawable.img),
+                contentDescription = "image",
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.CenterHorizontally)
             )
-            Image(painter = painterResource(id = R.drawable.img), contentDescription = "image", modifier = Modifier
-                .size(200.dp)
-                .align(Alignment.CenterHorizontally) )
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            // event details
             EvenDetails(
                 eventName = "Name of Event",
                 eventDate = "16 Dec 2023",
-                eventLocation ="Manavada ,Nagpur" ,
+                eventLocation = "Manavada ,Nagpur",
                 eventOrganizer = "Chirag Nikam",
                 leadMobile = "+91 7878900324",
-                eventLongDescription ="This section is about Ngo.It will have short description and " + "and the moto of the Ngo, ngoDescription. It is a long established fact that a reader " +
+                eventLongDescription = "This section is about Ngo.It will have short description and " + "and the moto of the Ngo, ngoDescription. It is a long established fact that a reader " +
                         "will be distracted by readable content of page when there is no hope of " +
                         "meaning for the words."
             )
             Spacer(modifier = Modifier.height(32.dp))
+
+            // status
             StatusCard()
+
             Spacer(modifier = Modifier.height(12.dp))
+
+            // upload image
             UploadImageBox()
         }
     }
@@ -108,7 +135,14 @@ fun EventDetailScreen(){
 
 
 @Composable
-fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eventOrganizer: String,leadMobile:String,eventLongDescription:String) {
+fun EvenDetails(
+    eventName: String,
+    eventDate: String,
+    eventLocation: String,
+    eventOrganizer: String,
+    leadMobile: String,
+    eventLongDescription: String
+) {
     var isEventLongDescriptionExpanded by remember { mutableStateOf(false) }
 
     Card(
@@ -119,7 +153,6 @@ fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eve
     ) {
         Column(
             modifier = Modifier
-                .background(Color(0xFFF9FFF3))
                 .padding(16.dp)
         ) {
             Text(
@@ -130,7 +163,11 @@ fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eve
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            DataViewInCard(info = eventName, infoDesc = "Event Name", image = Icons.Default.AccountBox)
+            DataViewInCard(
+                info = eventName,
+                infoDesc = "Event Name",
+                image = Icons.Default.AccountBox
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -158,8 +195,10 @@ fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eve
             ExpandableEventInfo(
                 text = eventLongDescription,
                 expanded = isEventLongDescriptionExpanded,
-                onToggleExpand = { isEventLongDescriptionExpanded = !isEventLongDescriptionExpanded },
-                imageVector = Icons.Default.List
+                onToggleExpand = {
+                    isEventLongDescriptionExpanded = !isEventLongDescriptionExpanded
+                },
+                imageVector = Icons.AutoMirrored.Filled.List
             )
 
         }
@@ -171,8 +210,8 @@ fun EvenDetails(eventName: String, eventDate: String, eventLocation: String, eve
 fun EventTextInfo(text: String, imageVector: ImageVector) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            imageVector=imageVector,
-            contentDescription =null,
+            imageVector = imageVector,
+            contentDescription = null,
             modifier = Modifier.size(22.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -185,12 +224,17 @@ fun EventTextInfo(text: String, imageVector: ImageVector) {
 }
 
 @Composable
-fun ExpandableEventInfo(text: String, expanded: Boolean, onToggleExpand: () -> Unit, imageVector: ImageVector) {
+fun ExpandableEventInfo(
+    text: String,
+    expanded: Boolean,
+    onToggleExpand: () -> Unit,
+    imageVector: ImageVector
+) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector=imageVector,
-                contentDescription =null,
+                imageVector = imageVector,
+                contentDescription = null,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -225,7 +269,6 @@ fun StatusCard() {
     ) {
         Column(
             modifier = Modifier
-                .background(Color(0xFFF9FFF3))
                 .padding(16.dp)
         ) {
             Text(
@@ -250,7 +293,7 @@ fun StatusCard() {
                         contentDescription = "liveCheck"
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    EventStatus(isLive = true)
+                    EventStatus(isLive = false)
                     Spacer(modifier = Modifier.weight(1f))
                     OutlinedButton(
                         onClick = { },
@@ -261,9 +304,9 @@ fun StatusCard() {
                 }
             }
 
-            }
         }
     }
+}
 
 
 @Composable
@@ -295,53 +338,51 @@ fun EventStatus(isLive: Boolean) {
 fun UploadImageBox() {
     val context = LocalContext.current
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
-    val imagePickerLauncher= rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()) {
-            uris: List<Uri> ->
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             imageUris = uris
         }
     }
 
-
-
     Box(
         modifier = Modifier
             .padding(14.dp)
             .fillMaxSize()
-            .background(Color.White)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Start),
-                horizontalArrangement = Arrangement.Center
-            ){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Start)
+                    .clickable { imagePickerLauncher.launch("image/*") },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.bi_image),
                     contentDescription = "icons",
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(start = 8.dp)
                         .size(28.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(text = "Upload Image",
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Upload Image",
                     fontSize = 18.sp,
-                    modifier = Modifier.padding(top = 12.dp),
                     textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { imagePickerLauncher.launch("image/*") }) {
+                    Icon(
+                        imageVector = Icons.Default.AddCircle,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentDescription = "upload Image Icon",
                     )
-                Spacer(modifier = Modifier.padding(60.dp))
-                Icon(
-                    imageVector = Icons.Default.AddCircle,
-                    modifier = Modifier
-                        .padding(top = 12.dp, end = 6.dp)
-                        .fillMaxWidth()
-                        .clickable {
-                            imagePickerLauncher.launch("image/*")
-                        },
-                    contentDescription = "upload Image Icon",)
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -367,7 +408,6 @@ fun UploadImageBox() {
             } else Icon(
                 painter = painterResource(id = R.drawable.bi_image),
                 contentDescription = "Upload Image",
-                tint = Color.Black
             )
 
         }
@@ -386,7 +426,6 @@ private fun PreviewUploadImageBox() {
 @Composable
 private fun PreviewEventDetailScreen() {
     SevaSahyogTheme {
-        EventDetailScreen()
+        EventDetailScreen(rememberNavController())
     }
-
 }

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -44,14 +45,15 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun EventScreen(navController: NavController) {
+fun EventScreen(navController: NavController, appNavController: NavController) {
     Scaffold (
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate("event/createEventScreen")
+                    appNavController.navigate("event/createEventScreen")
                 },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
@@ -115,7 +117,7 @@ fun EventScreen(navController: NavController) {
                 ) {
                     items(8){
                         PastEvent(eventYear = "2024", onClick = {
-                            navController.navigate("event/eventDetailScreen")
+                            appNavController.navigate("event/eventDetailScreen")
                         })
                     }
                 }
@@ -129,19 +131,22 @@ fun EventScreen(navController: NavController) {
 fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer
+        )
     ) {
         Column(
             modifier = Modifier
-                .background(Color(0xFF9ECC6F))
                 .padding(16.dp)
         ) {
             Text(
                 text = eventName,
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.Black,
                 fontWeight = FontWeight.Bold
             )
             Text(
@@ -160,15 +165,13 @@ fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String) {
 
             ClickableText(
                 text = AnnotatedString("View Details"),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color.Black,
-                    fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
                     textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                    // Handle the click action here, e.g., navigate to details screen
-                }
+                onClick = {}
             )
         }
     }
@@ -182,27 +185,27 @@ fun PastEvent(eventYear: String, onClick: () -> Unit) {
             .height(110.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.elevatedCardColors(Color(0xFFA6E1E0))
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+        )
 
     ) {
-        Column(
-            modifier = Modifier
-                .padding(top = 16.dp, bottom = 14.dp, start = 10.dp, end = 8.dp)
-        ) {
-            Text(
-                text = eventYear,
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.Black,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "View Events",
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                fontWeight = FontWeight.Normal
-            )
-
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = eventYear,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "View Events",
+                    fontWeight = FontWeight.Normal
+                )
+            }
         }
     }
 }
@@ -210,6 +213,7 @@ fun PastEvent(eventYear: String, onClick: () -> Unit) {
 @Preview
 @Composable
 private fun PreviewEventScreen() {
-    EventScreen(navController = rememberNavController())
-
+    SevaSahyogTheme {
+        EventScreen(navController = rememberNavController(), appNavController = rememberNavController())
+    }
 }

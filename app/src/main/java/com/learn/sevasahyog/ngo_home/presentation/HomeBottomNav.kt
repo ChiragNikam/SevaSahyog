@@ -66,7 +66,7 @@ fun HomeBottomNav(
         }
     }) {
         Surface(modifier = Modifier.padding(it)) {
-            NgoBottomNavigation(bottomNavController)
+            NgoBottomNavigation(bottomNavController, appNavController = navHostController)
         }
     }
 }

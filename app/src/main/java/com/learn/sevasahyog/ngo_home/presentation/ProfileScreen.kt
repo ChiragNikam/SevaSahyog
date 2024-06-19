@@ -264,8 +264,8 @@ fun ExpandableInfoRow(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
                     .clickable(onClick = onToggleExpand),
-                maxLines = 2,
-                overflow = TextOverflow.Visible
+                maxLines = if (!expanded) 2 else 12,
+                overflow = TextOverflow.Ellipsis
             )
         }
         if (text.length > 100) {

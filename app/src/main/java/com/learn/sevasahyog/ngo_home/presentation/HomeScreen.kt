@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -50,7 +51,12 @@ fun HomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            Text(text = "Today")
+            Text(
+                text = "TODAY",
+                style = MaterialTheme.typography.labelLarge,
+                letterSpacing = MaterialTheme.typography.labelLarge.letterSpacing
+            )
+
             Spacer(modifier = Modifier.height(14.dp))
 
             EventCard(
@@ -60,7 +66,8 @@ fun HomeScreen(navController: NavController) {
                 description = "Techweek curates exciting programming that allows a global spotlight " +
                         "to shine on each ecosystem and its leaders. Past speakers include Rahm Emanuel, " +
                         "Travis Kalanick (CEO, Uber), Craig Newmark (Founder, Craigslist)," +
-                        " Barney Harford (CEO, Orbitz), and Chuck Templeton (Founder, OpenTable)")
+                        " Barney Harford (CEO, Orbitz), and Chuck Templeton (Founder, OpenTable)"
+            )
         }
     }
 
@@ -73,13 +80,10 @@ fun EventCard(eventName: String, byName: String, location: String, description: 
             .fillMaxWidth()
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
-
     ) {
         Column(
             modifier = Modifier
-                .background(Color(0xFFF9FFF3))
                 .padding(16.dp)
-
         ) {
             Text(
                 text = eventName,
@@ -88,19 +92,19 @@ fun EventCard(eventName: String, byName: String, location: String, description: 
             )
             Text(
                 text = byName,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(top = 4.dp)
             )
             Text(
                 text = location,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
             )
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 6.dp),
                 fontWeight = FontWeight.Normal
             )
@@ -113,7 +117,8 @@ fun EventCard(eventName: String, byName: String, location: String, description: 
                 Text(
                     text = "Upload Image",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color(0xFF479E9C)
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Icon(
                     imageVector = Icons.Default.AddCircle,

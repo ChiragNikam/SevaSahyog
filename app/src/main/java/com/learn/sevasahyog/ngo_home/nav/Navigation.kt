@@ -13,7 +13,8 @@ import com.learn.sevasahyog.ngo_home.presentation.HomeScreen
 
 @Composable
 fun NgoBottomNavigation(
-    navHostController:NavHostController
+    navHostController:NavHostController,
+    appNavController: NavHostController
 ) {
 
     NavHost(navController = navHostController, startDestination = "home") {
@@ -22,18 +23,7 @@ fun NgoBottomNavigation(
         }
 
         composable("event") {
-            EventScreen(navController = navHostController)
-        }
-        navigation(startDestination = "event/eventScreen", route = "event_screen"){
-            composable(route="event/eventScreen"){
-                EventScreen(navController = navHostController)
-            }
-            composable(route="event/createEventScreen"){
-                CreateEvent()
-            }
-            composable(route="event/eventDetailScreen"){
-                EventDetailScreen()
-            }
+            EventScreen(navController = navHostController, appNavController = appNavController)
         }
 
         composable("profile") {
