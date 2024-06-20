@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
@@ -69,56 +71,52 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
                 .background(MaterialTheme.colorScheme.background)
         ) {
             Column(
-                modifier = Modifier.padding(start = 10.dp, end = 16.dp, top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp)
             ) {
                 Text(
+                    modifier = Modifier.padding(start = 18.dp),
                     text = "Events",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight(700)
                 )
+                Spacer(modifier = Modifier.height(18.dp))
+                Text(modifier = Modifier.padding(start = 20.dp), text = "UPCOMING EVENTS", letterSpacing = 2.sp, style = MaterialTheme.typography.labelLarge)
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = "UPCOMING EVENTS", style = MaterialTheme.typography.labelLarge, letterSpacing = MaterialTheme.typography.labelMedium.letterSpacing)
-
-                Row(
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .padding(8.dp)
+                LazyRow(
+                    modifier = Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
-                    UpcomingEvent(
-                        eventName = "Office Meeting",
-                        leadBy = "Rajat kr",
-                        dateOfEvent = "12/08/2024"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    UpcomingEvent(
-                        eventName = "Fruits distribution",
-                        leadBy = "Mohan",
-                        dateOfEvent = "19/08/2024"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    UpcomingEvent(
-                        eventName = "awareness scheme",
-                        leadBy = "Chirag",
-                        dateOfEvent = "10/02/2024"
-                    )
+                    item { Spacer(modifier = Modifier.width(4.dp)) }
+                    items(6){
+                        UpcomingEvent(
+                            eventName = "Office Meeting",
+                            leadBy = "Rajat kr",
+                            dateOfEvent = "12/08/2024"
+                        ){
+                            appNavController.navigate("event/eventDetailScreen")
+                        }
+                    }
+                    item { Spacer(modifier = Modifier.width(4.dp)) }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                Text(text = "PAST EVENTS", style = MaterialTheme.typography.labelLarge, letterSpacing = MaterialTheme.typography.labelMedium.letterSpacing)
+                Column (modifier = Modifier.padding(horizontal = 16.dp)){
+                    Text(text = "PAST EVENTS", letterSpacing = 2.sp, style = MaterialTheme.typography.labelLarge)
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 128.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(8){
-                        PastEvent(eventYear = "2024", onClick = {
-                            appNavController.navigate("event/eventDetailScreen")
-                        })
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 128.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(8){
+                            PastEvent(eventYear = "2024", onClick = {
+                                appNavController.navigate("event/eventDetailScreen")
+                            })
+                        }
+                        item { Spacer(modifier = Modifier.height(12.dp)) }
                     }
                 }
             }
@@ -128,7 +126,7 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
 }
 
 @Composable
-fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String) {
+fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String, onViewEvent: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -171,7 +169,7 @@ fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String) {
                     textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {}
+                onClick = { onViewEvent() }
             )
         }
     }

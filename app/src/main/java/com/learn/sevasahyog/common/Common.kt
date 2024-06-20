@@ -1,5 +1,6 @@
 package com.learn.sevasahyog.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -18,10 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,6 +87,47 @@ fun CardInfoView(
             Spacer(modifier = Modifier.height(20.dp))
 
             content()
+        }
+    }
+}
+
+@Composable
+fun ExpandableInfoRow(
+    text: String,
+    expanded: Boolean,
+    onToggleExpand: () -> Unit,
+    imageVector: ImageVector
+) {
+    Column {
+        Row {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .size(22.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .clickable(onClick = onToggleExpand),
+                maxLines = if (!expanded) 2 else 12,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        if (text.length > 100) {
+            Text(
+                text = if (expanded) "Read less" else "Read more",
+                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
+                modifier = Modifier
+                    .clickable(onClick = onToggleExpand)
+                    .padding(horizontal = 8.dp)
+                    .align(Alignment.End)
+            )
         }
     }
 }

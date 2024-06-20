@@ -32,7 +32,9 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -68,7 +70,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
+import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
@@ -109,20 +113,70 @@ fun EventDetailScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(10.dp))
 
             // event details
-            EvenDetails(
-                eventName = "Name of Event",
-                eventDate = "16 Dec 2023",
-                eventLocation = "Manavada ,Nagpur",
-                eventOrganizer = "Chirag Nikam",
-                leadMobile = "+91 7878900324",
-                eventLongDescription = "This section is about Ngo.It will have short description and " + "and the moto of the Ngo, ngoDescription. It is a long established fact that a reader " +
-                        "will be distracted by readable content of page when there is no hope of " +
-                        "meaning for the words."
-            )
+            var isEventLongDescriptionExpanded by remember { mutableStateOf(false) }
+            CardInfoView(label = "Event Details") {
+                DataViewInCard(
+                    info = "eventName",
+                    infoDesc = "Event Name",
+                    image = Icons.Default.AccountBox
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                // event date
+                DataViewInCard(info = "eventDate", infoDesc = "Date", image = Icons.Default.DateRange)
+
+                Spacer(modifier = Modifier.height(10.dp))
+                // event location
+                DataViewInCard(info = "eventLocation", infoDesc = "Location", image = Icons.Default.LocationOn)
+
+                Spacer(modifier = Modifier.height(10.dp))
+                // event organizer name
+                DataViewInCard(info = "eventOrganizer", infoDesc = "Organizer", image = Icons.Default.Person)
+
+                Spacer(modifier = Modifier.height(10.dp))
+                // organizer mobile number
+                DataViewInCard(info = "mobile", infoDesc = "Mobile", image = Icons.Default.Phone)
+
+                Spacer(modifier = Modifier.height(10.dp))
+                // event long description
+                ExpandableInfoRow(
+                    text = "eventLongDescription",
+                    expanded = isEventLongDescriptionExpanded,
+                    onToggleExpand = { isEventLongDescriptionExpanded = !isEventLongDescriptionExpanded },
+                    imageVector = Icons.AutoMirrored.Filled.List
+                )
+
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // status
-            StatusCard()
+            CardInfoView(label = "Status") {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.vector__1_),
+                            contentDescription = "liveCheck"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        EventStatus(isLive = false)
+                        Spacer(modifier = Modifier.weight(1f))
+                        OutlinedButton(
+                            onClick = { },
+                        ) {
+                            Text("Update")
+                        }
+
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -130,184 +184,7 @@ fun EventDetailScreen(navController: NavController) {
             UploadImageBox()
         }
     }
-
 }
-
-
-@Composable
-fun EvenDetails(
-    eventName: String,
-    eventDate: String,
-    eventLocation: String,
-    eventOrganizer: String,
-    leadMobile: String,
-    eventLongDescription: String
-) {
-    var isEventLongDescriptionExpanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Event Details",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            DataViewInCard(
-                info = eventName,
-                infoDesc = "Event Name",
-                image = Icons.Default.AccountBox
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            DataViewInCard(info = eventDate, infoDesc = "Date", image = Icons.Default.DateRange)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            EventTextInfo(
-                text = eventLocation,
-                imageVector = Icons.Default.Place
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            EventTextInfo(
-                text = eventOrganizer,
-                imageVector = Icons.Default.Person
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            EventTextInfo(
-                text = leadMobile,
-                imageVector = Icons.Default.Call
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            ExpandableEventInfo(
-                text = eventLongDescription,
-                expanded = isEventLongDescriptionExpanded,
-                onToggleExpand = {
-                    isEventLongDescriptionExpanded = !isEventLongDescriptionExpanded
-                },
-                imageVector = Icons.AutoMirrored.Filled.List
-            )
-
-        }
-
-    }
-}
-
-@Composable
-fun EventTextInfo(text: String, imageVector: ImageVector) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = null,
-            modifier = Modifier.size(22.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Normal
-        )
-    }
-}
-
-@Composable
-fun ExpandableEventInfo(
-    text: String,
-    expanded: Boolean,
-    onToggleExpand: () -> Unit,
-    imageVector: ImageVector
-) {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = imageVector,
-                contentDescription = null,
-                modifier = Modifier.size(22.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = if (expanded) text else text.take(100) + if (text.length > 100) "..." else "",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .clickable(onClick = onToggleExpand)
-            )
-        }
-        if (text.length > 100) {
-            Text(
-                text = if (expanded) "Read less" else "Read more",
-                style = MaterialTheme.typography.bodySmall.copy(color = Color.Blue),
-                modifier = Modifier
-                    .clickable(onClick = onToggleExpand)
-                    .align(Alignment.End)
-            )
-        }
-    }
-}
-
-@Composable
-fun StatusCard() {
-    Card(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Status",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.vector__1_),
-                        contentDescription = "liveCheck"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    EventStatus(isLive = false)
-                    Spacer(modifier = Modifier.weight(1f))
-                    OutlinedButton(
-                        onClick = { },
-                    ) {
-                        Text("Update")
-                    }
-
-                }
-            }
-
-        }
-    }
-}
-
 
 @Composable
 fun EventStatus(isLive: Boolean) {
@@ -320,7 +197,8 @@ fun EventStatus(isLive: Boolean) {
         ) {
             Text(
                 text = if (isLive) "Ongoing" else "Finished",
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
@@ -329,8 +207,7 @@ fun EventStatus(isLive: Boolean) {
                 tint = if (isLive) Color.Green else Color.Red
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "Event Status")
+        Text(text = "Event Status", fontSize = MaterialTheme.typography.labelMedium.fontSize)
     }
 }
 

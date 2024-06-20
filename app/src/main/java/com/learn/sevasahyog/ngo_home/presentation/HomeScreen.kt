@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
@@ -49,12 +50,12 @@ fun HomeScreen(navController: NavController) {
                 fontWeight = FontWeight(700)
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = "TODAY",
                 style = MaterialTheme.typography.labelLarge,
-                letterSpacing = MaterialTheme.typography.labelLarge.letterSpacing
+                letterSpacing = 4.sp
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -70,7 +71,6 @@ fun HomeScreen(navController: NavController) {
             )
         }
     }
-
 }
 
 @Composable

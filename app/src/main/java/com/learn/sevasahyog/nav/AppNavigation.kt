@@ -1,12 +1,9 @@
 package com.learn.sevasahyog.nav
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +14,6 @@ import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
 import com.learn.sevasahyog.ngo_home.presentation.CreateEvent
 import com.learn.sevasahyog.ngo_home.presentation.EventDetailScreen
-import com.learn.sevasahyog.ngo_home.presentation.EventScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
 @Composable
@@ -32,7 +28,7 @@ fun AppNavigation(navController: NavHostController) {
     )
     NavHost(
         navController = navController,
-        startDestination = "ngo"
+        startDestination = "auth"
     ) {
         navigation(startDestination = "auth/signIn", route = "auth") {
             composable(route = "auth/signIn") {

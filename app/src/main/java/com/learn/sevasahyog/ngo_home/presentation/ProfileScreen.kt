@@ -55,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
+import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.ngo_home.domain.ProfileViewModel
 
 @Composable
@@ -239,48 +240,6 @@ fun UserProfileImage(modifier: Modifier = Modifier) {
         }
     }
 }
-
-@Composable
-fun ExpandableInfoRow(
-    text: String,
-    expanded: Boolean,
-    onToggleExpand: () -> Unit,
-    imageVector: ImageVector
-) {
-    Column {
-        Row {
-            Icon(
-                imageVector = imageVector,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .size(22.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .clickable(onClick = onToggleExpand),
-                maxLines = if (!expanded) 2 else 12,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-        if (text.length > 100) {
-            Text(
-                text = if (expanded) "Read less" else "Read more",
-                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSecondaryContainer),
-                modifier = Modifier
-                    .clickable(onClick = onToggleExpand)
-                    .padding(horizontal = 8.dp)
-                    .align(Alignment.End)
-            )
-        }
-    }
-}
-
 
 @Preview
 @Composable
