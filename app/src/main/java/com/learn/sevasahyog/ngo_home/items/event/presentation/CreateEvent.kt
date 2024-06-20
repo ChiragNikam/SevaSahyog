@@ -1,4 +1,4 @@
-package com.learn.sevasahyog.ngo_home.presentation
+package com.learn.sevasahyog.ngo_home.items.event.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,16 +11,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun CreateEvent() {
+fun CreateEvent(appNavController: NavController) {
 
     var eventName by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
@@ -33,7 +34,7 @@ fun CreateEvent() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onPrimary)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
 
@@ -49,13 +50,15 @@ fun CreateEvent() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Close Icon
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Close",
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .size(32.dp)
-            )
+            IconButton(onClick = { appNavController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .size(32.dp)
+                )
+            }
 
             // Spacer to push the title to the center
             Spacer(modifier = Modifier.weight(1f))
@@ -74,10 +77,6 @@ fun CreateEvent() {
             // Save Button
             Button(
                 onClick = { /* Handle save action */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF5FAA14),
-                    contentColor = Color.White
-                ),
                 modifier = Modifier.align(Alignment.CenterVertically),
 
                 ) {
@@ -209,5 +208,5 @@ fun CommonOutlinedTextField(
 @Preview
 @Composable
 private fun PreviewCreateEvent() {
-    CreateEvent()
+    CreateEvent(rememberNavController())
 }

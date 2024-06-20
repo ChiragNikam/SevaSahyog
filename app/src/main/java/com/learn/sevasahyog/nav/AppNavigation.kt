@@ -12,8 +12,8 @@ import com.learn.sevasahyog.auth.presentation.ChooseAccountType
 import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
-import com.learn.sevasahyog.ngo_home.presentation.CreateEvent
-import com.learn.sevasahyog.ngo_home.presentation.EventDetailScreen
+import com.learn.sevasahyog.ngo_home.items.event.presentation.CreateEvent
+import com.learn.sevasahyog.ngo_home.items.event.presentation.EventDetailScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
 @Composable
@@ -57,7 +57,7 @@ fun AppNavigation(navController: NavHostController) {
                     enterTransition = { inHorizontal },
                     popExitTransition = { outHorizontal }
                 ) {
-                    CreateEvent()
+                    CreateEvent(navController)
                 }
                 composable(
                     route = "event/eventDetailScreen",

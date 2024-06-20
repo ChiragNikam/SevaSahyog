@@ -1,4 +1,4 @@
-package com.learn.sevasahyog.ngo_home.presentation
+package com.learn.sevasahyog.ngo_home.items.all.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,10 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -34,7 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun AllScreen(navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -134,6 +131,6 @@ fun EventCard(eventName: String, byName: String, location: String, description: 
 @Composable
 private fun PreviewHomeScreen() {
     SevaSahyogTheme {
-        HomeScreen(navController = rememberNavController())
+        AllScreen(navController = rememberNavController())
     }
 }
