@@ -41,6 +41,10 @@ class SessionManager(context: Context?) {
         editor!!.commit()
     }
 
+    fun updateToken(token: String?){
+        editor!!.putString(KEY_TOKEN, token)
+    }
+
     fun checkLogin() {
         if (!this.isLoggedIn()) {
             // If user is not logged in, redirect to login activity
@@ -63,6 +67,10 @@ class SessionManager(context: Context?) {
         editor!!.clear()
         editor!!.commit()
         return true
+    }
+
+    fun getUserType(): String? {
+        return pref!!.getString(KEY_USER_TYPE, "user")
     }
 
     fun isLoggedIn(): Boolean {

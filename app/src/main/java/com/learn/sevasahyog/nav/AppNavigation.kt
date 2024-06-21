@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.learn.sevasahyog.SplashScreen
 import com.learn.sevasahyog.auth.presentation.ChooseAccountType
 import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
@@ -17,7 +18,7 @@ import com.learn.sevasahyog.ngo_home.items.event.presentation.EventDetailScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
+fun AppNavigation(navController: NavHostController, isLoggedIn: Boolean) {
     val inHorizontal = slideInHorizontally(
         initialOffsetX = { fullWidth -> fullWidth },
         animationSpec = tween(durationMillis = 300)
@@ -28,8 +29,23 @@ fun AppNavigation(navController: NavHostController) {
     )
     NavHost(
         navController = navController,
-        startDestination = "auth"
+        startDestination = "splash"
     ) {
+        navigation(startDestination = "splashScreen", route = "splash") {
+            composable(route = "splashScreen") {
+                SplashScreen { isLoggedIn, userType, isLoginSuccess ->
+                    navController.popBackStack()
+                    if (isLoggedIn && isLoginSuccess) {
+                        if (userType == "user")
+                            navController.navigate("")
+                        else
+                            navController.navigate("ngo")
+                    } else {
+                        navController.navigate("auth")
+                    }
+                }
+            }
+        }
         navigation(startDestination = "auth/signIn", route = "auth") {
             composable(route = "auth/signIn") {
                 SignIn(navController = navController)
