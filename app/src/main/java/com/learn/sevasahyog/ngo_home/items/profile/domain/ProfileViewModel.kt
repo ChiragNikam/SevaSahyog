@@ -1,6 +1,7 @@
 package com.learn.sevasahyog.ngo_home.items.profile.domain
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -38,7 +39,7 @@ class ProfileViewModel : ViewModel() {
 
     // user id
     private val _userId = MutableStateFlow("")
-    val userId get() = _userId
+    val userId get() = _userId.asStateFlow()
 
     fun updateUserId(uid: String){
         _userId.value = uid
@@ -50,19 +51,29 @@ class ProfileViewModel : ViewModel() {
 
     // ngo profile obj
     private val _profile = MutableStateFlow(NgoAccount())
-    val profile get() = _profile
+    val profile get() = _profile.asStateFlow()
 
-    val handler = CoroutineExceptionHandler{_, throwable ->
-        println(throwable.localizedMessage)
+    // internet connection
+    private val _internetConnection = MutableStateFlow(true)
+    val internetConnection get() = _internetConnection.asStateFlow()
+
+    private val handler = CoroutineExceptionHandler{ _, throwable ->
+        _internetConnection.value = false
+        throwable.localizedMessage?.let { Log.e("error", it) }
     }
+    private val ngoService: NgoService = RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/").create(NgoService::class.java)
+
 
     fun loadProfile(){
-        viewModelScope.launch {
-            val ngoService = RetrofitInstance.getClient("http://192.168.43.231:8080/").create(NgoService::class.java)
+        viewModelScope.launch(handler) {
+            // if internet available
+            _internetConnection.value = true
+
             val userProfileResponse = ngoService.getUserProfile(token = "Bearer ${_accessToken.value}", _userId.value)
 
             if (userProfileResponse.isSuccessful) {
                 _profile.value = userProfileResponse.body()!!
+                _userProfileProgress.value = false
             } else{
                 val errorBody = userProfileResponse.errorBody()?.string()
                 Log.d("error_response_raw", errorBody ?: "No error body")
@@ -78,9 +89,8 @@ class ProfileViewModel : ViewModel() {
                 }
 
                 Log.d("error_response", userProfileResponse.code().toString())
-                Log.d("error_response_body", errorResponse?.errorMessage ?: "No error message")
+                _userProfileProgress.value = false
             }
-            _userProfileProgress.value = false
         }
     }
 }

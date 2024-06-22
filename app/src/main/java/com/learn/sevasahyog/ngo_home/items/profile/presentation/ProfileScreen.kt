@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.common.CheckInternetConnectionView
 import com.learn.sevasahyog.auth.common.ShimmerListItem
 import com.learn.sevasahyog.auth.common.shimmerEffect
 import com.learn.sevasahyog.auth.domain.SessionManager
@@ -53,7 +55,9 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    // do network request for the user profile and load it to view-model
     viewModel.loadProfile()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -67,165 +71,184 @@ fun ProfileScreen(
         data["token"]?.let { viewModel.updateAccessToken(it) }
         data["uid"]?.let { viewModel.updateUserId(it) }
 
-        Column {
-            Column(
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp)
-            ) {
-                Text(
-                    text = "Profile",
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                    fontWeight = FontWeight(700)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+        val internetConnection by viewModel.internetConnection.collectAsState()
+
+        if (!internetConnection)
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                CheckInternetConnectionView(modifier = Modifier.fillMaxSize(), imageModifier = Modifier.size(150.dp))
+                Button(onClick = { viewModel.loadProfile() }) {
+                    Text(text = "Refresh")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(imageVector = Icons.Default.Refresh, contentDescription = "refresh")
+                }
             }
-            val userProfileProgress by viewModel.userProfileProgress.collectAsState()
-            if (userProfileProgress)
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
-            UserProfileImage(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-            )
-
-            Spacer(modifier = Modifier.height(70.dp))
-
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-            ) {
-                val profile by viewModel.profile.collectAsState()
-                // user info
-                val userName = profile.userName
-                val mobileNo = profile.mobileNo
-                val email = profile.email
-                CardInfoView(label = "User Info") {
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = {
-                            ContentBeforeLoading()
-                        }) {
-                        DataViewInCard(
-                            info = userName,
-                            infoDesc = "User Name",
-                            image = Icons.Filled.Face
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = { ContentBeforeLoading() }
-                    ) {
-                        DataViewInCard(
-                            info = mobileNo,
-                            infoDesc = "Mobile",
-                            image = Icons.Filled.Phone
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = { ContentBeforeLoading() }
-                    ) {
-                        DataViewInCard(
-                            info = email,
-                            infoDesc = "E-mail",
-                            image = Icons.Filled.Email
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // ngo info
-                val ngoName = profile.ngoName
-                val ngoLocation = profile.location
-                val aboutNgo = profile.aboutNgo
-                val ngoDescription = profile.aboutNgo
-                var isAboutNgoExpanded by remember { mutableStateOf(false) }
-                var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
-                CardInfoView(label = "Ngo Info") {
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = { ContentBeforeLoading() }
-                    ) {
-                        DataViewInCard(info = ngoName, infoDesc = "Ngo Name", image = Icons.Filled.Home)
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = { ContentBeforeLoading() }
-                    ) {
-                        DataViewInCard(
-                            info = ngoLocation,
-                            infoDesc = "Location",
-                            image = Icons.Filled.LocationOn
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = { ContentBeforeLoading() }
-                    ) {
-                        ExpandableInfoRow(
-                            text = aboutNgo,
-                            expanded = isAboutNgoExpanded,
-                            onToggleExpand = { isAboutNgoExpanded = !isAboutNgoExpanded },
-                            imageVector = Icons.Default.Info
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    ShimmerListItem(
-                        isLoading = userProfileProgress,
-                        contentBeforeLoading = { ContentBeforeLoading() }
-                    ) {
-                        ExpandableInfoRow(
-                            text = ngoDescription,
-                            expanded = isNgoDescriptionExpanded,
-                            onToggleExpand = { isNgoDescriptionExpanded = !isNgoDescriptionExpanded },
-                            imageVector = Icons.AutoMirrored.Filled.List
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = { },
+        if (internetConnection)
+            Column {
+                Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.CenterHorizontally),
-                    colors = ButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        disabledContentColor = MaterialTheme.colorScheme.onTertiary,
-                        disabledContainerColor = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
+                        .padding(start = 16.dp, top = 16.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Sign out", fontSize = 16.sp)
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "sign out"
-                        )
-                    }
+                    Text(
+                        text = "Profile",
+                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                        fontWeight = FontWeight(700)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
+                val userProfileProgress by viewModel.userProfileProgress.collectAsState()
+                if (userProfileProgress)
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
-                Spacer(modifier = Modifier.height(32.dp))
+                UserProfileImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                )
+
+                Spacer(modifier = Modifier.height(70.dp))
+
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                ) {
+                    val profile by viewModel.profile.collectAsState()
+                    // user info
+                    val userName = profile.userName
+                    val mobileNo = profile.mobileNo
+                    val email = profile.email
+                    CardInfoView(label = "User Info") {
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = {
+                                ContentBeforeLoading()
+                            }) {
+                            DataViewInCard(
+                                info = userName,
+                                infoDesc = "User Name",
+                                image = Icons.Filled.Face
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = { ContentBeforeLoading() }
+                        ) {
+                            DataViewInCard(
+                                info = mobileNo,
+                                infoDesc = "Mobile",
+                                image = Icons.Filled.Phone
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = { ContentBeforeLoading() }
+                        ) {
+                            DataViewInCard(
+                                info = email,
+                                infoDesc = "E-mail",
+                                image = Icons.Filled.Email
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // ngo info
+                    val ngoName = profile.ngoName
+                    val ngoLocation = profile.location
+                    val aboutNgo = profile.aboutNgo
+                    val ngoDescription = profile.aboutNgo
+                    var isAboutNgoExpanded by remember { mutableStateOf(false) }
+                    var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
+                    CardInfoView(label = "Ngo Info") {
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = { ContentBeforeLoading() }
+                        ) {
+                            DataViewInCard(
+                                info = ngoName,
+                                infoDesc = "Ngo Name",
+                                image = Icons.Filled.Home
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = { ContentBeforeLoading() }
+                        ) {
+                            DataViewInCard(
+                                info = ngoLocation,
+                                infoDesc = "Location",
+                                image = Icons.Filled.LocationOn
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = { ContentBeforeLoading() }
+                        ) {
+                            ExpandableInfoRow(
+                                text = aboutNgo,
+                                expanded = isAboutNgoExpanded,
+                                onToggleExpand = { isAboutNgoExpanded = !isAboutNgoExpanded },
+                                imageVector = Icons.Default.Info
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        ShimmerListItem(
+                            isLoading = userProfileProgress,
+                            contentBeforeLoading = { ContentBeforeLoading() }
+                        ) {
+                            ExpandableInfoRow(
+                                text = ngoDescription,
+                                expanded = isNgoDescriptionExpanded,
+                                onToggleExpand = {
+                                    isNgoDescriptionExpanded = !isNgoDescriptionExpanded
+                                },
+                                imageVector = Icons.AutoMirrored.Filled.List
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = { },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.CenterHorizontally),
+                        colors = ButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            disabledContentColor = MaterialTheme.colorScheme.onTertiary,
+                            disabledContainerColor = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Sign out", fontSize = 16.sp)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "sign out"
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
             }
-        }
     }
 }
 
@@ -296,6 +319,7 @@ fun UserProfileImage(modifier: Modifier = Modifier) {
 
 @Composable
 fun ContentBeforeLoading(modifier: Modifier = Modifier) {
+    Spacer(modifier = Modifier.height(12.dp))
     Row {
         Box(
             modifier = Modifier

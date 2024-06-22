@@ -2,6 +2,7 @@ package com.learn.sevasahyog.auth.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.twotone.List
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -144,5 +147,15 @@ fun CommonErrorMessageView(
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+@Composable
+fun CheckInternetConnectionView(modifier: Modifier = Modifier, imageModifier: Modifier = Modifier) {
+    Box (modifier = modifier, contentAlignment = Alignment.Center){
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(modifier = imageModifier, imageVector = Icons.Rounded.Warning, contentDescription = "no internet")
+            Text(text = "Check internet connection")
+        }
     }
 }
