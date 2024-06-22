@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -39,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.common.ShimmerListItem
+import com.learn.sevasahyog.auth.common.shimmerEffect
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
@@ -98,19 +101,43 @@ fun ProfileScreen(
                 val mobileNo = profile.mobileNo
                 val email = profile.email
                 CardInfoView(label = "User Info") {
-                    DataViewInCard(
-                        info = userName,
-                        infoDesc = "User Name",
-                        image = Icons.Filled.Face
-                    )
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = {
+                            ContentBeforeLoading()
+                        }) {
+                        DataViewInCard(
+                            info = userName,
+                            infoDesc = "User Name",
+                            image = Icons.Filled.Face
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    DataViewInCard(info = mobileNo, infoDesc = "Mobile", image = Icons.Filled.Phone)
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = { ContentBeforeLoading() }
+                    ) {
+                        DataViewInCard(
+                            info = mobileNo,
+                            infoDesc = "Mobile",
+                            image = Icons.Filled.Phone
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    DataViewInCard(info = email, infoDesc = "E-mail", image = Icons.Filled.Email)
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = { ContentBeforeLoading() }
+                    ) {
+                        DataViewInCard(
+                            info = email,
+                            infoDesc = "E-mail",
+                            image = Icons.Filled.Email
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -123,33 +150,53 @@ fun ProfileScreen(
                 var isAboutNgoExpanded by remember { mutableStateOf(false) }
                 var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
                 CardInfoView(label = "Ngo Info") {
-                    DataViewInCard(info = ngoName, infoDesc = "Ngo Name", image = Icons.Filled.Home)
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = { ContentBeforeLoading() }
+                    ) {
+                        DataViewInCard(info = ngoName, infoDesc = "Ngo Name", image = Icons.Filled.Home)
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    DataViewInCard(
-                        info = ngoLocation,
-                        infoDesc = "Location",
-                        image = Icons.Filled.LocationOn
-                    )
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = { ContentBeforeLoading() }
+                    ) {
+                        DataViewInCard(
+                            info = ngoLocation,
+                            infoDesc = "Location",
+                            image = Icons.Filled.LocationOn
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(6.dp))
 
-                    ExpandableInfoRow(
-                        text = aboutNgo,
-                        expanded = isAboutNgoExpanded,
-                        onToggleExpand = { isAboutNgoExpanded = !isAboutNgoExpanded },
-                        imageVector = Icons.Default.Info
-                    )
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = { ContentBeforeLoading() }
+                    ) {
+                        ExpandableInfoRow(
+                            text = aboutNgo,
+                            expanded = isAboutNgoExpanded,
+                            onToggleExpand = { isAboutNgoExpanded = !isAboutNgoExpanded },
+                            imageVector = Icons.Default.Info
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(6.dp))
 
-                    ExpandableInfoRow(
-                        text = ngoDescription,
-                        expanded = isNgoDescriptionExpanded,
-                        onToggleExpand = { isNgoDescriptionExpanded = !isNgoDescriptionExpanded },
-                        imageVector = Icons.AutoMirrored.Filled.List
-                    )
+                    ShimmerListItem(
+                        isLoading = userProfileProgress,
+                        contentBeforeLoading = { ContentBeforeLoading() }
+                    ) {
+                        ExpandableInfoRow(
+                            text = ngoDescription,
+                            expanded = isNgoDescriptionExpanded,
+                            onToggleExpand = { isNgoDescriptionExpanded = !isNgoDescriptionExpanded },
+                            imageVector = Icons.AutoMirrored.Filled.List
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -243,6 +290,36 @@ fun UserProfileImage(modifier: Modifier = Modifier) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ContentBeforeLoading(modifier: Modifier = Modifier) {
+    Row {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Box(
+                modifier = Modifier
+                    .width(150.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .height(20.dp)
+                    .shimmerEffect()
+            ) {}
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .width(70.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .height(12.dp)
+                    .shimmerEffect()
+            ) {}
         }
     }
 }

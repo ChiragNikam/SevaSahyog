@@ -127,7 +127,7 @@ fun CommonErrorMessageView(
             Text(
                 modifier = Modifier.weight(125f),
                 text = commonErrorMessage,
-                color = MaterialTheme.colorScheme.onError,
+                color = MaterialTheme.colorScheme.onErrorContainer,
                 fontSize = MaterialTheme.typography.labelLarge.fontSize,
                 fontWeight = FontWeight(700),
                 maxLines = 2,
