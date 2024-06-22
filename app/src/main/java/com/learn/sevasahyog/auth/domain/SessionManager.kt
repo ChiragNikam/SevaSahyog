@@ -41,8 +41,10 @@ class SessionManager(context: Context?) {
         editor!!.commit()
     }
 
-    fun updateToken(token: String?){
+    fun updateToken(token: String?, uid: String?){
         editor!!.putString(KEY_TOKEN, token)
+        editor!!.putString(KEY_UID, uid)
+        editor!!.commit()
     }
 
     fun checkLogin() {
@@ -60,6 +62,7 @@ class SessionManager(context: Context?) {
         user[KEY_TOKEN] = pref!!.getString(KEY_TOKEN, null)
         user[KEY_EMAIL] = pref!!.getString(KEY_EMAIL, null)
         user[KEY_PASSWORD] = pref!!.getString(KEY_PASSWORD, null)
+        user[KEY_UID] = pref!!.getString(KEY_UID, null)
         return user
     }
 

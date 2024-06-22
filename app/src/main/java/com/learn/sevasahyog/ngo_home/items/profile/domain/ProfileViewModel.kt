@@ -1,8 +1,22 @@
 package com.learn.sevasahyog.ngo_home.items.profile.domain
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonSyntaxException
+import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
+import com.learn.sevasahyog.network.RetrofitInstance
+import com.learn.sevasahyog.ngo_home.data.NgoAccount
+import com.learn.sevasahyog.ngo_home.data.NgoService
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 class ProfileViewModel : ViewModel() {
     //userInfo data
@@ -14,72 +28,61 @@ class ProfileViewModel : ViewModel() {
         this._coverImage.value = coverImage
     }
 
-    //user Profile
-    private val _userProfile = MutableStateFlow("")
-    val userProfile get() = _userProfile.asStateFlow()
+    // access token
+    private val _accessToken = MutableStateFlow("")
+    val accessToken get() = _accessToken
 
-    fun updateUserProfile(userProfile: String) {
-        this._userProfile.value = userProfile
+    fun updateAccessToken(token: String){
+        _accessToken.value = token
     }
 
-    //username
-    private val _userName = MutableStateFlow("Chirag Nikam")
-    val userName get() = _userName.asStateFlow()
+    // user id
+    private val _userId = MutableStateFlow("")
+    val userId get() = _userId
 
-    fun updateUserName(userName: String) {
-        this._userName.value = userName
+    fun updateUserId(uid: String){
+        _userId.value = uid
     }
 
-    //phone number
-    private val _phoneNumber = MutableStateFlow("+91 1111111111")
-    val phoneNumber get() = _phoneNumber.asStateFlow()
+    // user-profile progress
+    private val _userProfileProgress = MutableStateFlow(true)
+    val userProfileProgress get() = _userProfileProgress
 
-    fun updatePhoneNumber(phoneNumber: String) {
-        this._phoneNumber.value = phoneNumber
+    // ngo profile obj
+    private val _profile = MutableStateFlow(NgoAccount())
+    val profile get() = _profile
+
+    val handler = CoroutineExceptionHandler{_, throwable ->
+        println(throwable.localizedMessage)
     }
 
-    //email
-    private val _email = MutableStateFlow("abc@gmail.com")
-    val email get() = _email.asStateFlow()
+    fun loadProfile(){
+        viewModelScope.launch {
+            val ngoService = RetrofitInstance.getClient("http://192.168.43.231:8080/").create(NgoService::class.java)
+            val userProfileResponse = ngoService.getUserProfile(token = "Bearer ${_accessToken.value}", _userId.value)
 
-    fun updateEmailName(email: String) {
-        this._email.value = email
-    }
+            if (userProfileResponse.isSuccessful) {
+                _profile.value = userProfileResponse.body()!!
+            } else{
+                val errorBody = userProfileResponse.errorBody()?.string()
+                Log.d("error_response_raw", errorBody ?: "No error body")
 
-    //Ngo Info
-    //ngo name
-    private val _ngoName = MutableStateFlow("My Ngo Name")
-    val ngoName get() = _ngoName.asStateFlow()
+                val gson = GsonBuilder().setLenient().create()
+                val errorResponse: ErrorResponse? = errorBody?.let {
+                    try {
+                        gson.fromJson(it, ErrorResponse::class.java)
+                    } catch (e: JsonSyntaxException) {
+                        Log.e("GsonError", "Error parsing JSON", e)
+                        null
+                    }
+                }
 
-    fun updateNgoName(ngoName: String) {
-        this._ngoName.value = ngoName
-    }
-
-    //Ngo location
-    private val _ngoLocation = MutableStateFlow("Nagpur, Maharashtra")
-    val ngoLocation get() = _ngoLocation.asStateFlow()
-
-    fun updateNgoLocation(ngoLocation: String) {
-        this._ngoLocation.value = ngoLocation
-    }
-
-    //Ngo Information
-    private val _ngoInfo = MutableStateFlow("This is about ngo")
-    val ngoInfo get() = _ngoInfo.asStateFlow()
-
-    fun updateNgoInfo(ngoInfo: String) {
-        this._ngoInfo.value = ngoInfo
-    }
-
-    //Ngo Long description
-    private val _ngoLongDescription = MutableStateFlow(
-        "It is a long established fact that a reader" +
-                "will be distracted by readable content of page when there is no hope of " +
-                "meaning for the words."
-    )
-    val ngoLongDescription get() = _ngoLongDescription.asStateFlow()
-
-    fun updateNgoLongDescription(ngoLongDescription: String) {
-        this._ngoLongDescription.value = ngoLongDescription
+                Log.d("error_response", userProfileResponse.code().toString())
+                Log.d("error_response_body", errorResponse?.errorMessage ?: "No error message")
+            }
+            _userProfileProgress.value = false
+        }
     }
 }
+
+data class ErrorResponse(val error: String)

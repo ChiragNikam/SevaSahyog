@@ -44,16 +44,18 @@ fun SplashScreen(modifier: Modifier = Modifier, onTimeout: (isLoggedIn: Boolean,
                     signInData = SignInRequest(email = sessionData["email"].toString(), password = sessionData["password"].toString()),
                     onResponse = {call, response->
                         if (response.isSuccessful){
-                            session.updateToken(response.body()?.token)
+                            val finalResponse = response.body()
+                            val uid = finalResponse?.ngoAccount?.userId
+                            session.updateToken(response.body()?.token, uid)
                             isLoginSuccess = true
-                            Log.d("login", "successful, token: ${response.body()?.token}")
+//                            Log.d("login", "successful, token: ${response.body()?.token}")
                         }
+                        onTimeout(session.isLoggedIn(), session.getUserType(), isLoginSuccess)
                     },
                     onFailure = {_, _->
-
+                        onTimeout(false, session.getUserType(), isLoginSuccess)
                     }
                 )
-                onTimeout(session.isLoggedIn(), session.getUserType(), isLoginSuccess)
             }
         }
     }

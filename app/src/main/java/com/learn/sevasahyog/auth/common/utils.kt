@@ -118,7 +118,7 @@ fun CommonErrorMessageView(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = MaterialTheme.colorScheme.error,
+                    color = MaterialTheme.colorScheme.errorContainer,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .padding(6.dp),

@@ -1,5 +1,6 @@
 package com.learn.sevasahyog.ngo_home.items.profile.presentation
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
@@ -47,12 +50,20 @@ fun ProfileScreen(
     navController: NavController,
     viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    viewModel.loadProfile()
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
     ) {
+        val context = LocalContext.current
+        val session = SessionManager(context)
+        val data = session.getUserDetails()
+        // set token and uid to view-model for network requests
+        data["token"]?.let { viewModel.updateAccessToken(it) }
+        data["uid"]?.let { viewModel.updateUserId(it) }
+
         Column {
             Column(
                 modifier = Modifier
@@ -65,6 +76,9 @@ fun ProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
+            val userProfileProgress by viewModel.userProfileProgress.collectAsState()
+            if (userProfileProgress)
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
             UserProfileImage(
                 modifier = Modifier
@@ -78,29 +92,34 @@ fun ProfileScreen(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
             ) {
+                val profile by viewModel.profile.collectAsState()
                 // user info
-                val userName by viewModel.userName.collectAsState()
-                val phoneNumber by viewModel.phoneNumber.collectAsState()
-                val userEmail by viewModel.email.collectAsState()
+                val userName = profile.userName
+                val mobileNo = profile.mobileNo
+                val email = profile.email
                 CardInfoView(label = "User Info") {
-                    DataViewInCard(info = userName, infoDesc = "User Name", image = Icons.Filled.Face)
+                    DataViewInCard(
+                        info = userName,
+                        infoDesc = "User Name",
+                        image = Icons.Filled.Face
+                    )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    DataViewInCard(info = phoneNumber, infoDesc = "Mobile", image = Icons.Filled.Phone)
+                    DataViewInCard(info = mobileNo, infoDesc = "Mobile", image = Icons.Filled.Phone)
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    DataViewInCard(info = userEmail, infoDesc = "E-mail", image = Icons.Filled.Email)
+                    DataViewInCard(info = email, infoDesc = "E-mail", image = Icons.Filled.Email)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // ngo info
-                val ngoName by viewModel.ngoName.collectAsState()
-                val ngoLocation by viewModel.ngoLocation.collectAsState()
-                val aboutNgo by viewModel.ngoInfo.collectAsState()
-                val ngoDescription by viewModel.ngoLongDescription.collectAsState()
+                val ngoName = profile.ngoName
+                val ngoLocation = profile.location
+                val aboutNgo = profile.aboutNgo
+                val ngoDescription = profile.aboutNgo
                 var isAboutNgoExpanded by remember { mutableStateOf(false) }
                 var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
                 CardInfoView(label = "Ngo Info") {
@@ -150,7 +169,10 @@ fun ProfileScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("Sign out", fontSize = 16.sp)
                         Spacer(modifier = Modifier.width(12.dp))
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "sign out")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "sign out"
+                        )
                     }
                 }
 
