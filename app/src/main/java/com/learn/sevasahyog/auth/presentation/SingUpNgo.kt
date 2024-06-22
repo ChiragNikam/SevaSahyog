@@ -50,11 +50,13 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.common.ValidatedTextField
 import com.learn.sevasahyog.auth.common.ValidatedTextFieldPassword
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.auth.domain.SignUpNgoViewModel
+import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable

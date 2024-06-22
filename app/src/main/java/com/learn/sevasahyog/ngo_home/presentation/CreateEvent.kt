@@ -18,17 +18,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.ngo_home.domain.CreateEventViewModel
 
 @Composable
-fun CreateEvent() {
-
-    var eventName by remember { mutableStateOf("") }
-    var eventDate by remember { mutableStateOf("") }
-    var eventLocation by remember { mutableStateOf("") }
-    var organizerName by remember { mutableStateOf("") }
-    var organizerMobileNo by remember { mutableStateOf("") }
-    var shortDescription by remember { mutableStateOf("") }
-    var longDescription by remember { mutableStateOf("") }
+fun CreateEvent(
+    navController: NavController,
+    viewModel: CreateEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+                ) {
 
     Column(
         modifier = Modifier
@@ -73,7 +72,7 @@ fun CreateEvent() {
 
             // Save Button
             Button(
-                onClick = { /* Handle save action */ },
+                onClick = {  },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF5FAA14),
                     contentColor = Color.White
@@ -84,11 +83,17 @@ fun CreateEvent() {
                 Text("Save", fontSize = 16.sp)
             }
         }
-
+        val eventName by viewModel.eventName.collectAsState()
+        val eventDate by viewModel.eventDate.collectAsState()
+        val eventLocation by viewModel.eventLocation.collectAsState()
+        val eventOrganizerName by viewModel.eventOrganizerName.collectAsState()
+        val organizerMobileNo by viewModel.organizerMobileNo.collectAsState()
+        val eventShortDesc by viewModel.eventShortDesc.collectAsState()
+        val eventLongDesc by viewModel.eventLongDesc.collectAsState()
         // Event Name
         LabeledTextField(
             value = eventName,
-            onValueChange = { eventName = it },
+            onValueChange = { eventName},
             label = "Event Name",
             leadingIcon = Icons.Default.Info
         )
@@ -96,7 +101,7 @@ fun CreateEvent() {
         // Event Date
         LabeledTextField(
             value = eventDate,
-            onValueChange = { eventDate = it },
+            onValueChange = { eventDate  },
             label = "Event Date",
             leadingIcon = Icons.Default.DateRange,
             trailingIcon = {
@@ -110,15 +115,15 @@ fun CreateEvent() {
         // Event Location
         LabeledTextField(
             value = eventLocation,
-            onValueChange = { eventLocation = it },
+            onValueChange = { eventLocation },
             label = "Event Location",
             leadingIcon = Icons.Default.Place
         )
 
         // Organizer Name
         LabeledTextField(
-            value = organizerName,
-            onValueChange = { organizerName = it },
+            value = eventOrganizerName,
+            onValueChange = { eventOrganizerName },
             label = "Organizer Name",
             leadingIcon = Icons.Default.Person
         )
@@ -126,7 +131,7 @@ fun CreateEvent() {
         // Organizer Mobile No.
         LabeledTextField(
             value = organizerMobileNo,
-            onValueChange = { organizerMobileNo = it },
+            onValueChange = { organizerMobileNo },
             label = "Organizer Mobile No.",
             leadingIcon = Icons.Default.Phone,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
@@ -134,8 +139,8 @@ fun CreateEvent() {
 
         // Short Description
         LabeledTextField(
-            value = shortDescription,
-            onValueChange = { shortDescription = it },
+            value = eventShortDesc,
+            onValueChange = { eventShortDesc},
             label = "Short Description",
             leadingIcon = Icons.Default.Create,
             maxLines = 2
@@ -143,8 +148,8 @@ fun CreateEvent() {
 
         // Long Description
         LabeledTextField(
-            value = longDescription,
-            onValueChange = { longDescription = it },
+            value = eventLongDesc,
+            onValueChange = { eventLongDesc},
             label = "Long Description",
             leadingIcon = Icons.Default.List,
             maxLines = 5
@@ -209,5 +214,5 @@ fun CommonOutlinedTextField(
 @Preview
 @Composable
 private fun PreviewCreateEvent() {
-    CreateEvent()
+    CreateEvent(navController = rememberNavController())
 }

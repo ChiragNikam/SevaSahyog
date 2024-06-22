@@ -29,7 +29,7 @@ fun NgoBottomNavigation(
                 EventScreen(navController = navHostController)
             }
             composable(route="event/createEventScreen"){
-                CreateEvent()
+                CreateEvent(navController = navHostController)
             }
             composable(route="event/eventDetailScreen"){
                 EventDetailScreen()
