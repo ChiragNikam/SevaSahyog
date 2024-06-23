@@ -131,35 +131,37 @@ class SignInViewModel : ViewModel() {
     }
 
     private fun loginAsNgo() {
-        authRepo.ngoSignIn(
-            signInData = SignInRequest(email = email.value, password = password.value),
-            onResponse = { call, response ->
-                if (response.code() == 200) {
-                    _ngoSignInSuccess.value = true
-                    val signInResponse = response.body()
-                    if (signInResponse != null){
-                        _signInToken.value = signInResponse.token
-                        _userId.value = signInResponse.ngoAccount.userId
+        viewModelScope.launch {
+            authRepo.ngoSignIn(
+                signInData = SignInRequest(email = email.value, password = password.value),
+                onResponse = { call, response ->
+                    if (response.code() == 200) {
+                        _ngoSignInSuccess.value = true
+                        val signInResponse = response.body()
+                        if (signInResponse != null){
+                            _signInToken.value = signInResponse.token
+                            _userId.value = signInResponse.ngoAccount.userId
+                        }
+                        Log.i("login_success", "success")
+                    } else if (response.code() == 409) {
+                        val errorBody = response.errorBody()?.string()
+                        val errorResponse = errorBody.let {
+                            Gson().fromJson(it, ErrorResponse::class.java)
+                        }
+                        _signInError.value = true
+                        _signInErrorMessage.value = errorResponse.errorMessage
+                        Log.e("login_error", errorResponse.errorMessage)
                     }
-                    Log.i("login_success", "success")
-                } else if (response.code() == 409) {
-                    val errorBody = response.errorBody()?.string()
-                    val errorResponse = errorBody.let {
-                        Gson().fromJson(it, ErrorResponse::class.java)
-                    }
+                    _signInProgress.value = false
+                    Log.d("code", response.code().toString())
+                },
+                onFailure = { call, t ->
+                    t.message?.let { Log.e("login_error", it) }
                     _signInError.value = true
-                    _signInErrorMessage.value = errorResponse.errorMessage
-                    Log.e("login_error", errorResponse.errorMessage)
+                    _signInErrorMessage.value = t.message.toString()
+                    _signInProgress.value = false
                 }
-                _signInProgress.value = false
-                Log.d("code", response.code().toString())
-            },
-            onFailure = { call, t ->
-                t.message?.let { Log.e("login_error", it) }
-                _signInError.value = true
-                _signInErrorMessage.value = t.message.toString()
-                _signInProgress.value = false
-            }
-        )
+            )
+        }
     }
 }

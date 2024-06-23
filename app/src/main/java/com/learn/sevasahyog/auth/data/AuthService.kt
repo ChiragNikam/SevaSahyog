@@ -13,6 +13,9 @@ interface AuthService {
     @POST("auth/ngo/signIn")
     fun signInAsNgo(@Body request: SignInRequest): Call<SignInResponseNgo>
 
+    @POST("auth/ngo/signIn")
+    suspend fun signInAsNgoSusp(@Body request: SignInRequest): Response<SignInResponseNgo>
+
     @POST("/auth/ngo/signUp")
     fun singUpAsNgo(@Body request: SignUpRequestNgo): Call<NgoAccount>
 }

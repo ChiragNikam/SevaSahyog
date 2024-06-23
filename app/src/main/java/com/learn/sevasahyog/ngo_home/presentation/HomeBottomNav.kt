@@ -30,8 +30,8 @@ fun HomeBottomNav(
 ) {
     val bottomBarItems = listOf(
         BottomNavigationItem(
-            title = "Home",
-            route = "home",
+            title = "All",
+            route = "all",
             selectedIcon = painterResource(id = R.drawable.material_symbols_light_home),
             unselectedIcon = painterResource(id = R.drawable.material_symbols_light_home_outline)
         ),
@@ -66,7 +66,7 @@ fun HomeBottomNav(
         }
     }) {
         Surface(modifier = Modifier.padding(it)) {
-            NgoBottomNavigation(bottomNavController)
+            NgoBottomNavigation(bottomNavController, appNavController = navHostController)
         }
     }
 }

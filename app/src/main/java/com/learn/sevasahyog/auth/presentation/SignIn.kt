@@ -61,6 +61,7 @@ fun SignIn(
     val context = LocalContext.current
     val session = SessionManager(context)
     if (session.isLoggedIn()) {
+        navController.popBackStack()
         navController.navigate("ngo")
     }
     Surface(
