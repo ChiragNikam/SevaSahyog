@@ -19,15 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
+import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
 
 @Composable
 fun CreateEvent(
     appNavController: NavController,
-    viewModel: CreateEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -80,64 +78,59 @@ fun CreateEvent(
                     Text("Save", fontSize = 16.sp)
                 }
             }
-            val eventName by viewModel.eventName.collectAsState()
-            val eventDate by viewModel.eventDate.collectAsState()
-            val eventLocation by viewModel.eventLocation.collectAsState()
-            val eventOrganizerName by viewModel.eventOrganizerName.collectAsState()
-            val organizerMobileNo by viewModel.organizerMobileNo.collectAsState()
-            val eventShortDesc by viewModel.eventShortDesc.collectAsState()
-            val eventLongDesc by viewModel.eventLongDesc.collectAsState()
+            val event by viewModel.event.collectAsState()
+
             // Event Name
             LabeledTextField(
-                value = eventName,
-                onValueChange = { eventName },
+                value = event.name,
+                onValueChange = { viewModel.updateEventName(it) },
                 label = "Event Name",
                 leadingIcon = Icons.Default.Info
             )
 
             // Event Date
-            LabeledTextField(
-                value = eventDate,
-                onValueChange = { eventDate },
-                label = "Event Date",
-                leadingIcon = Icons.Default.DateRange,
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Calendar"
-                    )
-                }
-            )
+//            LabeledTextField(
+//                value = event.dd ,
+//                onValueChange = { eventDate },
+//                label = "Event Date",
+//                leadingIcon = Icons.Default.DateRange,
+//                trailingIcon = {
+//                    Icon(
+//                        imageVector = Icons.Default.DateRange,
+//                        contentDescription = "Calendar"
+//                    )
+//                }
+//            )
 
             // Event Location
             LabeledTextField(
-                value = eventLocation,
-                onValueChange = { eventLocation },
+                value = event.location,
+                onValueChange = { viewModel.updateEventLocation(it)},
                 label = "Event Location",
                 leadingIcon = Icons.Default.Place
             )
 
             // Organizer Name
             LabeledTextField(
-                value = eventOrganizerName,
-                onValueChange = { eventOrganizerName },
+                value = event.organizer,
+                onValueChange = { viewModel.updateEventOrganizerName(it) },
                 label = "Organizer Name",
                 leadingIcon = Icons.Default.Person
             )
-
-            // Organizer Mobile No.
-            LabeledTextField(
-                value = organizerMobileNo,
-                onValueChange = { organizerMobileNo },
-                label = "Organizer Mobile No.",
-                leadingIcon = Icons.Default.Phone,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-            )
+//
+//            // Organizer Mobile No.
+//            LabeledTextField(
+//                value = organizerMobileNo,
+//                onValueChange = { organizerMobileNo },
+//                label = "Organizer Mobile No.",
+//                leadingIcon = Icons.Default.Phone,
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+//            )
 
             // Short Description
             LabeledTextField(
-                value = eventShortDesc,
-                onValueChange = { eventShortDesc },
+                value = event.shortDesc,
+                onValueChange = { viewModel.updateEventShortDesc(it) },
                 label = "Short Description",
                 leadingIcon = Icons.Default.Create,
                 maxLines = 2
@@ -145,8 +138,8 @@ fun CreateEvent(
 
             // Long Description
             LabeledTextField(
-                value = eventLongDesc,
-                onValueChange = { eventLongDesc },
+                value = event.longDesc,
+                onValueChange = { viewModel.updateEventLongDesc(it) },
                 label = "Long Description",
                 leadingIcon = Icons.Default.List,
                 maxLines = 5
