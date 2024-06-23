@@ -65,7 +65,7 @@ fun AppNavigation(navController: NavHostController, isLoggedIn: Boolean) {
                 HomeBottomNav(navHostController = navController)
             }
             navigation(
-                startDestination = "event/eventScreen",
+                startDestination = "event/eventDetailScreen",
                 route = "event_screen",
             ) {
                 composable(

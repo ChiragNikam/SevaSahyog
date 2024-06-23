@@ -17,140 +17,146 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.ngo_home.domain.CreateEventViewModel
 
 @Composable
-fun CreateEvent(appNavController: NavController) {
+fun CreateEvent(
+    appNavController: NavController,
+    viewModel: CreateEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
 
-    var eventName by remember { mutableStateOf("") }
-    var eventDate by remember { mutableStateOf("") }
-    var eventLocation by remember { mutableStateOf("") }
-    var organizerName by remember { mutableStateOf("") }
-    var organizerMobileNo by remember { mutableStateOf("") }
-    var shortDescription by remember { mutableStateOf("") }
-    var longDescription by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Close Icon
-            IconButton(onClick = { appNavController.navigateUp() }) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .size(32.dp)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Close Icon
+                IconButton(onClick = { appNavController.navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .size(32.dp)
+                    )
+                }
+
+                // Spacer to push the title to the center
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Title
+                Text(
+                    text = "Create Event",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
+
+                // Spacer to push the save button to the end
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Save Button
+                Button(
+                    onClick = { },
+                    modifier = Modifier.align(Alignment.CenterVertically),
+
+                    ) {
+                    Text("Save", fontSize = 16.sp)
+                }
             }
-
-            // Spacer to push the title to the center
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Title
-            Text(
-                text = "Create Event",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterVertically)
+            val eventName by viewModel.eventName.collectAsState()
+            val eventDate by viewModel.eventDate.collectAsState()
+            val eventLocation by viewModel.eventLocation.collectAsState()
+            val eventOrganizerName by viewModel.eventOrganizerName.collectAsState()
+            val organizerMobileNo by viewModel.organizerMobileNo.collectAsState()
+            val eventShortDesc by viewModel.eventShortDesc.collectAsState()
+            val eventLongDesc by viewModel.eventLongDesc.collectAsState()
+            // Event Name
+            LabeledTextField(
+                value = eventName,
+                onValueChange = { eventName },
+                label = "Event Name",
+                leadingIcon = Icons.Default.Info
             )
 
-            // Spacer to push the save button to the end
-            Spacer(modifier = Modifier.weight(1f))
+            // Event Date
+            LabeledTextField(
+                value = eventDate,
+                onValueChange = { eventDate },
+                label = "Event Date",
+                leadingIcon = Icons.Default.DateRange,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Calendar"
+                    )
+                }
+            )
 
-            // Save Button
-            Button(
-                onClick = { /* Handle save action */ },
-                modifier = Modifier.align(Alignment.CenterVertically),
+            // Event Location
+            LabeledTextField(
+                value = eventLocation,
+                onValueChange = { eventLocation },
+                label = "Event Location",
+                leadingIcon = Icons.Default.Place
+            )
 
-                ) {
-                Text("Save", fontSize = 16.sp)
-            }
+            // Organizer Name
+            LabeledTextField(
+                value = eventOrganizerName,
+                onValueChange = { eventOrganizerName },
+                label = "Organizer Name",
+                leadingIcon = Icons.Default.Person
+            )
+
+            // Organizer Mobile No.
+            LabeledTextField(
+                value = organizerMobileNo,
+                onValueChange = { organizerMobileNo },
+                label = "Organizer Mobile No.",
+                leadingIcon = Icons.Default.Phone,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+            )
+
+            // Short Description
+            LabeledTextField(
+                value = eventShortDesc,
+                onValueChange = { eventShortDesc },
+                label = "Short Description",
+                leadingIcon = Icons.Default.Create,
+                maxLines = 2
+            )
+
+            // Long Description
+            LabeledTextField(
+                value = eventLongDesc,
+                onValueChange = { eventLongDesc },
+                label = "Long Description",
+                leadingIcon = Icons.Default.List,
+                maxLines = 5
+            )
+
         }
-
-        // Event Name
-        LabeledTextField(
-            value = eventName,
-            onValueChange = { eventName = it },
-            label = "Event Name",
-            leadingIcon = Icons.Default.Info
-        )
-
-        // Event Date
-        LabeledTextField(
-            value = eventDate,
-            onValueChange = { eventDate = it },
-            label = "Event Date",
-            leadingIcon = Icons.Default.DateRange,
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Calendar"
-                )
-            }
-        )
-
-        // Event Location
-        LabeledTextField(
-            value = eventLocation,
-            onValueChange = { eventLocation = it },
-            label = "Event Location",
-            leadingIcon = Icons.Default.Place
-        )
-
-        // Organizer Name
-        LabeledTextField(
-            value = organizerName,
-            onValueChange = { organizerName = it },
-            label = "Organizer Name",
-            leadingIcon = Icons.Default.Person
-        )
-
-        // Organizer Mobile No.
-        LabeledTextField(
-            value = organizerMobileNo,
-            onValueChange = { organizerMobileNo = it },
-            label = "Organizer Mobile No.",
-            leadingIcon = Icons.Default.Phone,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-        )
-
-        // Short Description
-        LabeledTextField(
-            value = shortDescription,
-            onValueChange = { shortDescription = it },
-            label = "Short Description",
-            leadingIcon = Icons.Default.Create,
-            maxLines = 2
-        )
-
-        // Long Description
-        LabeledTextField(
-            value = longDescription,
-            onValueChange = { longDescription = it },
-            label = "Long Description",
-            leadingIcon = Icons.Default.List,
-            maxLines = 5
-        )
-
     }
-}
+
+
 
 @Composable
 fun LabeledTextField(
@@ -205,8 +211,9 @@ fun CommonOutlinedTextField(
     )
 }
 
+
 @Preview
 @Composable
 private fun PreviewCreateEvent() {
-    CreateEvent(rememberNavController())
+    CreateEvent(appNavController = rememberNavController())
 }
