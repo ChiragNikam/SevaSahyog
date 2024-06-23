@@ -1,4 +1,4 @@
-package com.learn.sevasahyog.ngo_home.domain
+package com.learn.sevasahyog.ngo_home.items.event.domain
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
