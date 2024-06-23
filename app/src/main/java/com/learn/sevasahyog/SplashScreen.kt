@@ -50,12 +50,15 @@ fun SplashScreen(modifier: Modifier = Modifier, onTimeout: (isLoggedIn: Boolean,
                             isLoginSuccess = true
 //                            Log.d("login", "successful, token: ${response.body()?.token}")
                         }
-                        onTimeout(session.isLoggedIn(), session.getUserType(), isLoginSuccess)
                     },
-                    onFailure = {_, _->
-                        onTimeout(false, session.getUserType(), isLoginSuccess)
+                    onFailure = {_, throwable->
+                        throwable.localizedMessage?.let { Log.d("login_fail", it) }
                     }
                 )
+                if (isLoginSuccess)
+                    onTimeout(session.isLoggedIn(), session.getUserType(), isLoginSuccess)
+                else
+                    onTimeout(false, session.getUserType(), isLoginSuccess)
             }
         }
     }

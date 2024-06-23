@@ -80,6 +80,7 @@ class EventViewModel : ViewModel() {
     private val _event = MutableStateFlow(EventRequest())
     val event get() = _event
 
+
     // Function to create event
     fun createEvent() {
         viewModelScope.launch {
@@ -112,5 +113,4 @@ class EventViewModel : ViewModel() {
         }
     }
 }
-
 

@@ -168,7 +168,7 @@ fun EventDetailScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(12.dp))
 
             // upload image
-            UploadImageBox()
+            UploadImageBox()    // TODO: Add URI's to view model
         }
     }
 }

@@ -16,7 +16,7 @@ class AuthRepo {
     val authService =
         RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/").create(AuthService::class.java)
 
-    fun ngoSignIn(
+    suspend fun ngoSignIn(
         signInData: SignInRequest,
         onResponse: (call: Call<SignInResponseNgo>, response: Response<SignInResponseNgo>) -> Unit,
         onFailure: (call: Call<SignInResponseNgo>, t: Throwable) -> Unit
