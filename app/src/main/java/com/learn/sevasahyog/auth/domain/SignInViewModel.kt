@@ -152,16 +152,16 @@ class SignInViewModel : ViewModel() {
                         _signInErrorMessage.value = errorResponse.errorMessage
                         Log.e("login_error", errorResponse.errorMessage)
                     }
-                    _signInProgress.value = false
+
                     Log.d("code", response.code().toString())
                 },
                 onFailure = { call, t ->
                     t.message?.let { Log.e("login_error", it) }
                     _signInError.value = true
                     _signInErrorMessage.value = t.message.toString()
-                    _signInProgress.value = false
                 }
             )
+            _signInProgress.value = false
         }
     }
 }

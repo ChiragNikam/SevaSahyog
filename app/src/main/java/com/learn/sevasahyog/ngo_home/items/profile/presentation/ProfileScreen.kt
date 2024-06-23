@@ -53,6 +53,7 @@ import com.learn.sevasahyog.ngo_home.items.profile.domain.ProfileViewModel
 @Composable
 fun ProfileScreen(
     navController: NavController,
+    appNavController: NavController,
     viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     // do network request for the user profile and load it to view-model
@@ -65,7 +66,8 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         val context = LocalContext.current
-        val session = SessionManager(context)
+
+        val session = SessionManager(context)   // session to get the user details stored in shared-preference
         val data = session.getUserDetails()
         // set token and uid to view-model for network requests
         data["token"]?.let { viewModel.updateAccessToken(it) }
@@ -225,7 +227,12 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Button(
-                        onClick = { },
+                        onClick = {
+                            session.logoutUser()
+                            // pop complete ngo navigation from the nav graph and start auth
+                            appNavController.popBackStack("ngo", true, saveState = false)
+                            appNavController.navigate("auth")
+                        },
                         modifier = Modifier
                             .fillMaxSize()
                             .align(Alignment.CenterHorizontally),
@@ -351,5 +358,5 @@ fun ContentBeforeLoading(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun PreviewProfileScreen() {
-    ProfileScreen(navController = rememberNavController())
+    ProfileScreen(navController = rememberNavController(), appNavController = rememberNavController())
 }

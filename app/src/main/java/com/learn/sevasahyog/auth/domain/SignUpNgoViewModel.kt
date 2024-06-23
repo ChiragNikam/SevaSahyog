@@ -2,6 +2,7 @@ package com.learn.sevasahyog.auth.domain
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
 import com.learn.sevasahyog.auth.data.dataclass.SignInRequest
@@ -9,6 +10,7 @@ import com.learn.sevasahyog.auth.data.dataclass.SignUpRequestNgo
 import com.learn.sevasahyog.auth.repo.AuthRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SignUpNgoViewModel : ViewModel() {
 
@@ -271,43 +273,45 @@ class SignUpNgoViewModel : ViewModel() {
         authRepo.ngoSignUp(
             signUpData = signUpData,
             onResponse = { call, response ->
-                if (response.code() == 200) {
-                    val signUpResponse = response.body()
-                    if (signUpResponse != null) {
-                        Log.d("sign_up", "success")
-                        _signUpSuccess.value = true
-                        // after creating account do signIn
-                        authRepo.ngoSignIn(
-                            signInData = SignInRequest(
-                                email = email.value,
-                                password = password.value
-                            ),
-                            onResponse = { call, signInResponse ->
-                                if (signInResponse.code() == 200) {
-                                    _signInSuccess.value = true
-                                    val signInResponseData = signInResponse.body()
-                                    if (signInResponseData != null) {
-                                        _signInToken.value = signInResponseData.token
-                                        _userId.value = signInResponseData.ngoAccount.userId
+                viewModelScope.launch {
+                    if (response.code() == 200) {
+                        val signUpResponse = response.body()
+                        if (signUpResponse != null) {
+                            Log.d("sign_up", "success")
+                            _signUpSuccess.value = true
+                            // after creating account do signIn
+                            authRepo.ngoSignIn(
+                                signInData = SignInRequest(
+                                    email = email.value,
+                                    password = password.value
+                                ),
+                                onResponse = { call, signInResponse ->
+                                    if (signInResponse.code() == 200) {
+                                        _signInSuccess.value = true
+                                        val signInResponseData = signInResponse.body()
+                                        if (signInResponseData != null) {
+                                            _signInToken.value = signInResponseData.token
+                                            _userId.value = signInResponseData.ngoAccount.userId
+                                        }
+                                    } else if (signInResponse.code() == 409) {
+                                        val errorBody = response.errorBody()?.string()
+                                        val errorResponse = errorBody.let {
+                                            Gson().fromJson(it, ErrorResponse::class.java)
+                                        }
+                                        _signInError.value = true
+                                        _signInErrorMessage.value = errorResponse.errorMessage
+                                        Log.e("login_error", errorResponse.errorMessage)
+                                    } else {
+                                        Log.i("login_success", "success")
                                     }
-                                } else if (signInResponse.code() == 409) {
-                                    val errorBody = response.errorBody()?.string()
-                                    val errorResponse = errorBody.let {
-                                        Gson().fromJson(it, ErrorResponse::class.java)
-                                    }
+                                },
+                                onFailure = { call, t ->
+                                    t.message?.let { Log.e("login_error", it) }
                                     _signInError.value = true
-                                    _signInErrorMessage.value = errorResponse.errorMessage
-                                    Log.e("login_error", errorResponse.errorMessage)
-                                } else {
-                                    Log.i("login_success", "success")
+                                    _signInErrorMessage.value = t.message.toString()
                                 }
-                            },
-                            onFailure = { call, t ->
-                                t.message?.let { Log.e("login_error", it) }
-                                _signInError.value = true
-                                _signInErrorMessage.value = t.message.toString()
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             },

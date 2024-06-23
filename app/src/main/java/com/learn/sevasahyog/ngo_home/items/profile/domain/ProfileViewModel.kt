@@ -58,6 +58,7 @@ class ProfileViewModel : ViewModel() {
     val internetConnection get() = _internetConnection.asStateFlow()
 
     private val handler = CoroutineExceptionHandler{ _, throwable ->
+//        if (throwable is )
         _internetConnection.value = false
         throwable.localizedMessage?.let { Log.e("error", it) }
     }
