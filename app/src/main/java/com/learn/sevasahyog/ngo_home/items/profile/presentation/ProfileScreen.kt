@@ -161,7 +161,7 @@ fun ProfileScreen(
                 val ngoName = profile.ngoName
                 val ngoLocation = profile.location
                 val aboutNgo = profile.aboutNgo
-                val ngoDescription = profile.aboutNgo
+                val ngoDescription = profile.longDesc
                 var isAboutNgoExpanded by remember { mutableStateOf(false) }
                 var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
                 CardInfoView(label = "Ngo Info") {
@@ -185,6 +185,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
+                    // about ngo
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         ExpandableInfoRow(

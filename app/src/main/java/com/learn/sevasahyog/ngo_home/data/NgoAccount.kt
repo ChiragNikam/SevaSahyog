@@ -10,5 +10,6 @@ data class NgoAccount(
     val ngoImage: String = "",
     val ngoName: String = "",
     val location: String = "",
-    val aboutNgo: String = ""
+    val aboutNgo: String = "",
+    val longDesc: String = ""
 )
