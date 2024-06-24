@@ -26,69 +26,69 @@ fun CreateEvent(
     appNavController: NavController,
     viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Close Icon
-                IconButton(onClick = { appNavController.navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .size(32.dp)
-                    )
-                }
-
-                // Spacer to push the title to the center
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Title
-                Text(
-                    text = "Create Event",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+            // Close Icon
+            IconButton(onClick = { appNavController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .size(32.dp)
                 )
-
-                // Spacer to push the save button to the end
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Save Button
-                Button(
-                    onClick = { },
-                    modifier = Modifier.align(Alignment.CenterVertically),
-
-                    ) {
-                    Text("Save", fontSize = 16.sp)
-                }
             }
-            val event by viewModel.event.collectAsState()
 
-            // Event Name
-            LabeledTextField(
-                value = event.name,
-                onValueChange = { viewModel.updateEventName(it) },
-                label = "Event Name",
-                leadingIcon = Icons.Default.Info
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = "Create Event",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
 
-            // Event Date
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Save Button
+            Button(
+                onClick = { },
+                modifier = Modifier.align(Alignment.CenterVertically),
+
+                ) {
+                Text("Save", fontSize = 16.sp)
+            }
+        }
+
+        val event by viewModel.event.collectAsState()
+
+        // Event Name
+        LabeledTextField(
+            value = event.name,
+            onValueChange = { eventName ->
+                viewModel.updateEvent { it.copy(name = eventName) }
+            },
+            label = "Event Name",
+            leadingIcon = Icons.Default.Info
+        )
+
+        // Event Date
 //            LabeledTextField(
 //                value = event.dd ,
 //                onValueChange = { eventDate },
@@ -102,22 +102,26 @@ fun CreateEvent(
 //                }
 //            )
 
-            // Event Location
-            LabeledTextField(
-                value = event.location,
-                onValueChange = { viewModel.updateEventLocation(it)},
-                label = "Event Location",
-                leadingIcon = Icons.Default.Place
-            )
+        // Event Location
+        LabeledTextField(
+            value = event.location,
+            onValueChange = { location ->
+                viewModel.updateEvent { it.copy(location = location) }
+            },
+            label = "Event Location",
+            leadingIcon = Icons.Default.Place
+        )
 
-            // Organizer Name
-            LabeledTextField(
-                value = event.organizer,
-                onValueChange = { viewModel.updateEventOrganizerName(it) },
-                label = "Organizer Name",
-                leadingIcon = Icons.Default.Person
-            )
-//
+        // Organizer Name
+        LabeledTextField(
+            value = event.organizer,
+            onValueChange = { organizer ->
+                viewModel.updateEvent { it.copy(organizer = organizer) }
+            },
+            label = "Organizer Name",
+            leadingIcon = Icons.Default.Person
+        )
+
 //            // Organizer Mobile No.
 //            LabeledTextField(
 //                value = organizerMobileNo,
@@ -127,27 +131,29 @@ fun CreateEvent(
 //                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
 //            )
 
-            // Short Description
-            LabeledTextField(
-                value = event.shortDesc,
-                onValueChange = { viewModel.updateEventShortDesc(it) },
-                label = "Short Description",
-                leadingIcon = Icons.Default.Create,
-                maxLines = 2
-            )
+        // Short Description
+        LabeledTextField(
+            value = event.shortDesc,
+            onValueChange = { shortDesc ->
+                viewModel.updateEvent { it.copy(shortDesc = shortDesc) }
+            },
+            label = "Short Description",
+            leadingIcon = Icons.Default.Create,
+            maxLines = 2
+        )
 
-            // Long Description
-            LabeledTextField(
-                value = event.longDesc,
-                onValueChange = { viewModel.updateEventLongDesc(it) },
-                label = "Long Description",
-                leadingIcon = Icons.Default.List,
-                maxLines = 5
-            )
+        // Long Description
+        LabeledTextField(
+            value = event.longDesc,
+            onValueChange = { longDesc ->
+                viewModel.updateEvent { it.copy(longDesc = longDesc) } },
+            label = "Long Description",
+            leadingIcon = Icons.Default.List,
+            maxLines = 5
+        )
 
-        }
     }
-
+}
 
 
 @Composable

@@ -18,55 +18,6 @@ import retrofit2.create
 
 class EventViewModel : ViewModel() {
 
-    //eventName
-    private val _eventName = MutableStateFlow("")
-    val eventName get() = _eventName.asStateFlow()
-    fun updateEventName(eventName: String) {
-        this._event.value.name = eventName
-    }
-
-    //eventDate
-    private val _eventDate = MutableStateFlow("")
-    val eventDate get() = _eventDate.asStateFlow()
-    fun updateEventDate(eventDate: String) {
-        this._eventDate.value = eventDate
-    }
-
-    //eventLocation
-    private val _eventLocation = MutableStateFlow("")
-    val eventLocation get() = _eventLocation.asStateFlow()
-    fun updateEventLocation(eventLocation: String) {
-        this._event.value.location = eventLocation
-    }
-
-    //event organizer name
-    private val _eventOrganizerName = MutableStateFlow("")
-    val eventOrganizerName get() = _eventOrganizerName.asStateFlow()
-    fun updateEventOrganizerName(eventOrganizerName: String) {
-        this._event.value.organizer = eventOrganizerName
-    }
-
-    //eventDate
-    private val _organizerMobileNo = MutableStateFlow("")
-    val organizerMobileNo get() = _organizerMobileNo.asStateFlow()
-//    fun updateOrganizerMobileNo(organizerMobileNo: String) {
-//        this._event.value.organizerMobileNumber = organizerMobileNo
-//    }
-
-    //eventDate
-    private val _eventShortDesc = MutableStateFlow("")
-    val eventShortDesc get() = _eventShortDesc.asStateFlow()
-    fun updateEventShortDesc(eventShortDesc: String) {
-        this._event.value.shortDesc = eventShortDesc
-    }
-
-    //eventDate
-    private val _eventLongDesc = MutableStateFlow("")
-    val eventLongDesc get() = _eventLongDesc.asStateFlow()
-    fun updateEventLongDesc(eventLongDesc: String) {
-        this._event.value.longDesc = eventLongDesc
-    }
-
     // access token
     private val _accessToken = MutableStateFlow("")
     val accessToken get() = _accessToken
@@ -78,8 +29,11 @@ class EventViewModel : ViewModel() {
     val createEvent get() = _createEvent
 
     private val _event = MutableStateFlow(EventRequest())
-    val event get() = _event
+    val event get() = _event.asStateFlow()
 
+    fun updateEvent(update: (EventRequest) -> EventRequest) {
+        _event.value = update(_event.value)
+    }
 
     // Function to create event
     fun createEvent() {
