@@ -101,11 +101,15 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp)
             ) {
-                Text(
-                    text = "Profile",
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                    fontWeight = FontWeight(700)
-                )
+                Row(modifier = Modifier.fillMaxWidth()){
+                    Text(
+                        text = "Profile",
+                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                        fontWeight = FontWeight(700)
+                    )
+
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
             val userProfileProgress by viewModel.userProfileProgress.collectAsState()
