@@ -22,11 +22,17 @@ class EventViewModel : ViewModel() {
     private val _accessToken = MutableStateFlow("")
     val accessToken get() = _accessToken
 
-    fun updateAccessToken(token: String){
+    fun updateAccessToken(token: String) {
         _accessToken.value = token
     }
-    private val _createEvent = MutableStateFlow(CreateEvent())
-    val createEvent get() = _createEvent
+
+    // email
+    private val _email = MutableStateFlow("")
+    val email get() = _email
+
+    fun updateEmail(email: String) {
+        _email.value = email
+    }
 
     private val _event = MutableStateFlow(EventRequest())
     val event get() = _event.asStateFlow()
@@ -35,15 +41,23 @@ class EventViewModel : ViewModel() {
         _event.value = update(_event.value)
     }
 
+    private val ngoService = RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/")
+        .create(NgoService::class.java)
+
     // Function to create event
-    fun createEvent() {
+  suspend   fun createEvent() {
         viewModelScope.launch {
             try {
-                val ngoService = RetrofitInstance.getClient("http://192.168.43.231:8080/").create(NgoService::class.java)
-                val eventResponse = ngoService.createEvent(token = "Bearer ${_accessToken.value}", createEventBody = _createEvent.value)
+                val createEvent =CreateEvent(_email.value,_event.value)
+                val eventResponse = ngoService.createEvent(
+                    token = "Bearer ${_accessToken.value}",
+                    createEventBody = createEvent
+                )
 
                 if (eventResponse.isSuccessful) {
-                    _event.value = (eventResponse.body() ?: EventRequest()) as EventRequest
+                    val savedEvent =eventResponse.body()
+                    Log.d("create_event","event response $savedEvent")
+
                 } else {
                     val errorBody = eventResponse.errorBody()?.string()
                     Log.d("error_response_raw", errorBody ?: "No error body")

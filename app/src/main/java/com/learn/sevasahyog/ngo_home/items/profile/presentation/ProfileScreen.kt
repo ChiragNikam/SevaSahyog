@@ -55,10 +55,10 @@ import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.ngo_home.items.profile.domain.ProfileViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
     appNavController: NavController,
     viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -101,7 +101,7 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp)
             ) {
-                Row(modifier = Modifier.fillMaxWidth()){
+                Row(modifier = Modifier.fillMaxWidth() ){
                     Text(
                         text = "Profile",
                         fontSize = MaterialTheme.typography.headlineMedium.fontSize,
@@ -116,6 +116,7 @@ fun ProfileScreen(
             if (userProfileProgress) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
             UserProfileImage(
+                profileViewModel =viewModel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
@@ -250,7 +251,8 @@ fun ProfileScreen(
 }
 
 @Composable
-fun UserProfileImage(modifier: Modifier = Modifier) {
+fun UserProfileImage(profileViewModel: ProfileViewModel,modifier: Modifier = Modifier) {
+
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
@@ -260,14 +262,39 @@ fun UserProfileImage(modifier: Modifier = Modifier) {
     val imagePickerLauncherBackground = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) backGroundUri = uri
+        if (uri != null) {
+            backGroundUri = uri
+            profileViewModel.uploadImageToFirebase(uri, "background_image_${profileViewModel.profile.value.userName}",
+                onSuccess = { url ->
+                    // Handle success, e.g., update the viewModel with the download URL
+                    profileViewModel.updateCoverImage(url)
+                },
+                onFailure = { e ->
+                    // Handle failure
+                    Log.e("Firebase", "Failed to upload image", e)
+                }
+            )
+        }
     }
 
-    val imagePickerLauncherProfile = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) profilePicUri = uri
-    }
+
+        val imagePickerLauncherProfile = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri ->
+            if (uri != null) {
+                profilePicUri = uri
+                profileViewModel.uploadImageToFirebase(uri, "profile_image_${profileViewModel.profile.value.userName}",
+                    onSuccess = { url ->
+                        // Handle success, e.g., update the viewModel with the download URL
+                        profileViewModel.updateProfileImage(url)
+                    },
+                    onFailure = { e ->
+                        // Handle failure
+                        Log.e("Firebase", "Failed to upload image", e)
+                    }
+                )
+            }
+        }
 
     Box(
         modifier = modifier
@@ -397,6 +424,6 @@ fun ContentBeforeLoading(modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewProfileScreen() {
     ProfileScreen(
-        navController = rememberNavController(), appNavController = rememberNavController()
+         appNavController = rememberNavController()
     )
 }

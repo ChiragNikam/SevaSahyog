@@ -1,9 +1,15 @@
 package com.learn.sevasahyog.ngo_home.items.profile.domain
 
+import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
@@ -17,9 +23,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.Dispatcher
 
 class ProfileViewModel : ViewModel() {
+
     //userInfo data
     //cover image
     private val _coverImage = MutableStateFlow("")
@@ -27,6 +35,13 @@ class ProfileViewModel : ViewModel() {
 
     fun updateCoverImage(coverImage: String) {
         this._coverImage.value = coverImage
+    }
+
+    private val _profileImage = MutableStateFlow("")
+    val profileImage get() = _profileImage.asStateFlow()
+
+    fun updateProfileImage(profileImage: String) {
+        this._profileImage.value = profileImage
     }
 
     // access token
@@ -94,6 +109,29 @@ class ProfileViewModel : ViewModel() {
             }
         }
     }
+
+    //function to upload image to firebase
+    fun uploadImageToFirebase(uri: Uri, fileName:String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit){
+        viewModelScope.launch {
+            try {
+                val storageReference =FirebaseStorage.getInstance().reference
+                val fileRef = storageReference.child("profile_images/$fileName")
+                fileRef.putFile(uri).await()
+                val downloadUrl = fileRef.downloadUrl.await().toString()
+                onSuccess(downloadUrl)
+            } catch (e:Exception){
+                onFailure(e)
+            }
+        }
+
+    }
 }
 
-data class ErrorResponse(val error: String)
+
+data class ErrorResponse(val error: String){
+
+}
+
+
+
+

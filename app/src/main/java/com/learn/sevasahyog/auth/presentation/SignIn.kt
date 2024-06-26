@@ -281,19 +281,19 @@ fun SignIn(
             ) {
                 IconButton(onClick = { }) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        painter = painterResource(id = R.drawable.skill_icons_gmail_light),
                         contentDescription = "Google"
                     )
                 }
                 IconButton(onClick = {}) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        painter = painterResource(id = R.drawable.devicon_facebook),
                         contentDescription = "Facebook"
                     )
                 }
                 IconButton(onClick = {}) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        painter = painterResource(id = R.drawable.skill_icons_instagram),
                         contentDescription = "Instagram"
                     )
                 }

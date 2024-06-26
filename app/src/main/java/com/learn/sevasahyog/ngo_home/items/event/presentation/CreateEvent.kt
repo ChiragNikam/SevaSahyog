@@ -12,20 +12,38 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun CreateEvent(
     appNavController: NavController,
     viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    val context = LocalContext.current
+
+    //get and set email and token for network request
+    val session =SessionManager(context)
+    val data=session.getUserDetails()
+    data["email"]?.let {
+        viewModel.updateEmail(it)
+    }
+    data["token"]?.let {
+        viewModel.updateAccessToken(it)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,8 +85,14 @@ fun CreateEvent(
             Spacer(modifier = Modifier.weight(1f))
 
             // Save Button
+            val coroutineScope = rememberCoroutineScope()
             Button(
-                onClick = { },
+                onClick = {
+                  coroutineScope.launch {
+                      viewModel.createEvent()
+                      appNavController.navigateUp()
+                  }
+                },
                 modifier = Modifier.align(Alignment.CenterVertically),
 
                 ) {
