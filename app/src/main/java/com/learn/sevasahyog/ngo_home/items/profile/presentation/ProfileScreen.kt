@@ -55,10 +55,10 @@ import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.ngo_home.items.profile.domain.ProfileViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
     appNavController: NavController,
     viewModel: ProfileViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -101,11 +101,15 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp)
             ) {
-                Text(
-                    text = "Profile",
-                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                    fontWeight = FontWeight(700)
-                )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Profile",
+                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                        fontWeight = FontWeight(700)
+                    )
+
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
             val userProfileProgress by viewModel.userProfileProgress.collectAsState()
@@ -113,10 +117,10 @@ fun ProfileScreen(
 
             // User Profile and Ngo Image
             UserProfileImage(
+              viewModel = viewModel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp),
-                viewModel
             )
 
             Spacer(modifier = Modifier.height(70.dp))
@@ -257,6 +261,7 @@ fun ProfileScreen(
 
 @Composable
 fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel) {
+
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
@@ -266,14 +271,44 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
     val imagePickerLauncherBackground = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) viewModel.updateBackgroundImage(uri)
+
+        if (uri != null) {
+            viewModel.updateBackgroundImage(uri)
+            viewModel.uploadImageToFirebase(uri, "B",
+                onSuccess = { url ->
+                    // Handle success, e.g., update the viewModel with the download URL
+                    viewModel.updateBackgroundImageUrl(url)
+                    Log.d("background_image"," background image successful ")
+                },
+                onFailure = { e ->
+                    // Handle failure
+                    Log.e("Firebase", "Failed to upload image", e)
+                }
+            )
+        }
     }
+
 
     val imagePickerLauncherProfile = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) viewModel.updateProfilePic(uri)
+        if (uri != null) {
+           viewModel.updateProfilePic(uri)
+            viewModel.uploadImageToFirebase(uri,
+                "P",
+                onSuccess = { url ->
+                    // Handle success, e.g., update the viewModel with the download URL
+                    viewModel.updateProfilePicUrl(url)
+                    Log.d("profile_image"," profile image successful ")
+                },
+                onFailure = { e ->
+                    // Handle failure
+                    Log.e("Firebase", "Failed to upload image", e)
+                }
+            )
+        }
     }
+
 
     Box(
         modifier = modifier
@@ -312,58 +347,58 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
                 modifier = Modifier.size(32.dp)
             )
         }
+    }
 
-        // Profile image picker
-        val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
-        val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
+// Profile image picker
+    val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
+    val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
+    Box(
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-            ) {
-                bitmapProfilePic?.let {
-                    Image(
-                        bitmap = bitmapProfilePic.asImageBitmap(),
-                        contentDescription = "Profile image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center),
-                        contentScale = ContentScale.FillBounds
-                    )
-                } ?: run {
-                    Image(
-                        painter = painterResource(id = R.drawable.iconamoon_profile_fill),
-                        contentDescription = "Profile image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center),
-                    )
-                }
-            }
-
-            IconButton( // to select profile image
-                onClick = { imagePickerLauncherProfile.launch("image/*") },
-                modifier = Modifier
-                    .padding(
-                        end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
-                        bottom = 8.dp
-                    )
-                    .align(Alignment.BottomEnd)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.AddCircle,
-                    contentDescription = "Add icon",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+            bitmapProfilePic?.let {
+                Image(
+                    bitmap = bitmapProfilePic.asImageBitmap(),
+                    contentDescription = "Profile image",
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.Center),
+                    contentScale = ContentScale.FillBounds
+                )
+            } ?: run {
+                Image(
+                    painter = painterResource(id = R.drawable.iconamoon_profile_fill),
+                    contentDescription = "Profile image",
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.Center),
                 )
             }
+        }
+
+        IconButton( // to select profile image
+            onClick = { imagePickerLauncherProfile.launch("image/*") },
+            modifier = Modifier
+                .padding(
+                    end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
+                    bottom = 8.dp
+                )
+                .align(Alignment.BottomEnd)
+                .size(36.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AddCircle,
+                contentDescription = "Add icon",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
@@ -403,6 +438,6 @@ fun ContentBeforeLoading(modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewProfileScreen() {
     ProfileScreen(
-        navController = rememberNavController(), appNavController = rememberNavController()
+        appNavController = rememberNavController()
     )
 }

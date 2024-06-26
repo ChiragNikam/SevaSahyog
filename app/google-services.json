@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "437299360426",
+    "project_id": "sevasahyog-5d362",
+    "storage_bucket": "sevasahyog-5d362.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:437299360426:android:738f69b87d2c465d4116d3",
+        "android_client_info": {
+          "package_name": "com.learn.sevasahyog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZT7eE3o0a6JFzzYdbFmbeo9Yj_SECyuI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

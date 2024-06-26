@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 
 android {
@@ -69,6 +70,10 @@ dependencies {
 
     // navigation animation
     implementation (libs.accompanist.navigation.animation)
+
+    // firebase storage
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.storage.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

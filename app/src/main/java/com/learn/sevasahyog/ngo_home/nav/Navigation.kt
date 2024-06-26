@@ -22,7 +22,7 @@ fun NgoBottomNavigation(
             EventScreen(navController = navHostController, appNavController = appNavController)
         }
         composable("profile") {
-            ProfileScreen(navController = navHostController, appNavController)
+            ProfileScreen( appNavController)
         }
     }
 }

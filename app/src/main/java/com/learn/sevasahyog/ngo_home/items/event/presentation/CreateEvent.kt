@@ -29,16 +29,18 @@ fun CreateEvent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
             .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
             .verticalScroll(rememberScrollState()),
+
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(0.dp))
+
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -48,16 +50,17 @@ fun CreateEvent(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close",
                     modifier = Modifier
+                        .align(Alignment.CenterVertically)
                         .size(32.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
             Text(
                 text = "Create Event",
-                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                fontWeight = MaterialTheme.typography.headlineMedium.fontWeight,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
 
@@ -66,9 +69,9 @@ fun CreateEvent(
             // Save Button
             Button(
                 onClick = { },
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            {
+                modifier = Modifier.align(Alignment.CenterVertically),
+
+                ) {
                 Text("Save", fontSize = 16.sp)
             }
         }
@@ -119,16 +122,14 @@ fun CreateEvent(
             leadingIcon = Icons.Default.Person
         )
 
-        // Organizer Mobile No.
-        LabeledTextField(
-            value = event.organizerPhone,
-            onValueChange = { phoneNo ->
-                viewModel.updateEvent { it.copy(organizerPhone = phoneNo) }
-            },
-            label = "Organizer Mobile No.",
-            leadingIcon = Icons.Default.Phone,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-        )
+//            // Organizer Mobile No.
+//            LabeledTextField(dd
+//                value = organizerMobileNo,
+//                onValueChange = { organizerMobileNo },
+//                label = "Organizer Mobile No.",
+//                leadingIcon = Icons.Default.Phone,
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+//            )
 
         // Short Description
         LabeledTextField(
@@ -145,8 +146,7 @@ fun CreateEvent(
         LabeledTextField(
             value = event.longDesc,
             onValueChange = { longDesc ->
-                viewModel.updateEvent { it.copy(longDesc = longDesc) }
-            },
+                viewModel.updateEvent { it.copy(longDesc = longDesc) } },
             label = "Long Description",
             leadingIcon = Icons.Default.List,
             maxLines = 5
