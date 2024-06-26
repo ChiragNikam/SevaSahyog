@@ -111,10 +111,12 @@ fun ProfileScreen(
             val userProfileProgress by viewModel.userProfileProgress.collectAsState()
             if (userProfileProgress) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
+            // User Profile and Ngo Image
             UserProfileImage(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .height(250.dp),
+                viewModel
             )
 
             Spacer(modifier = Modifier.height(70.dp))
@@ -128,6 +130,7 @@ fun ProfileScreen(
                 val mobileNo = profile.mobileNo
                 val email = profile.email
                 CardInfoView(label = "User Info") {
+                    // user name
                     ShimmerListItem(isLoading = userProfileProgress, contentBeforeLoading = {
                         ContentBeforeLoading()
                     }) {
@@ -138,6 +141,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // phone no
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -147,6 +151,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // email
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -165,6 +170,8 @@ fun ProfileScreen(
                 var isAboutNgoExpanded by remember { mutableStateOf(false) }
                 var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
                 CardInfoView(label = "Ngo Info") {
+
+                    // ngo name
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -174,6 +181,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // location
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -198,6 +206,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
+                    // long description
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         ExpandableInfoRow(
@@ -247,23 +256,23 @@ fun ProfileScreen(
 }
 
 @Composable
-fun UserProfileImage(modifier: Modifier = Modifier) {
+fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
-    var backGroundUri by remember { mutableStateOf<Uri?>(null) }
-    var profilePicUri by remember { mutableStateOf<Uri?>(null) }
+    val backGroundUri by viewModel.backgroundImage.collectAsState()
+    val profilePicUri by viewModel.profilePic.collectAsState()
 
     val imagePickerLauncherBackground = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) backGroundUri = uri
+        if (uri != null) viewModel.updateBackgroundImage(uri)
     }
 
     val imagePickerLauncherProfile = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        if (uri != null) profilePicUri = uri
+        if (uri != null) viewModel.updateProfilePic(uri)
     }
 
     Box(
