@@ -101,7 +101,7 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp)
             ) {
-                Row(modifier = Modifier.fillMaxWidth() ){
+                Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Profile",
                         fontSize = MaterialTheme.typography.headlineMedium.fontSize,
@@ -115,11 +115,12 @@ fun ProfileScreen(
             val userProfileProgress by viewModel.userProfileProgress.collectAsState()
             if (userProfileProgress) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
+            // User Profile and Ngo Image
             UserProfileImage(
-                profileViewModel =viewModel,
+              viewModel = viewModel,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .height(250.dp),
             )
 
             Spacer(modifier = Modifier.height(70.dp))
@@ -133,6 +134,7 @@ fun ProfileScreen(
                 val mobileNo = profile.mobileNo
                 val email = profile.email
                 CardInfoView(label = "User Info") {
+                    // user name
                     ShimmerListItem(isLoading = userProfileProgress, contentBeforeLoading = {
                         ContentBeforeLoading()
                     }) {
@@ -143,6 +145,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // phone no
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -152,6 +155,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // email
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -166,10 +170,12 @@ fun ProfileScreen(
                 val ngoName = profile.ngoName
                 val ngoLocation = profile.location
                 val aboutNgo = profile.aboutNgo
-                val ngoDescription = profile.aboutNgo
+                val ngoDescription = profile.longDesc
                 var isAboutNgoExpanded by remember { mutableStateOf(false) }
                 var isNgoDescriptionExpanded by remember { mutableStateOf(false) }
                 CardInfoView(label = "Ngo Info") {
+
+                    // ngo name
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -179,6 +185,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // location
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         DataViewInCard(
@@ -190,6 +197,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
+                    // about ngo
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         ExpandableInfoRow(
@@ -202,6 +210,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
+                    // long description
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
                         ExpandableInfoRow(
@@ -251,23 +260,25 @@ fun ProfileScreen(
 }
 
 @Composable
-fun UserProfileImage(profileViewModel: ProfileViewModel,modifier: Modifier = Modifier) {
+fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel) {
 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
-    var backGroundUri by remember { mutableStateOf<Uri?>(null) }
-    var profilePicUri by remember { mutableStateOf<Uri?>(null) }
+    val backGroundUri by viewModel.backgroundImage.collectAsState()
+    val profilePicUri by viewModel.profilePic.collectAsState()
 
     val imagePickerLauncherBackground = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
+
         if (uri != null) {
-            backGroundUri = uri
-            profileViewModel.uploadImageToFirebase(uri, "background_image_${profileViewModel.profile.value.userName}",
+            viewModel.updateBackgroundImage(uri)
+            viewModel.uploadImageToFirebase(uri, "B",
                 onSuccess = { url ->
                     // Handle success, e.g., update the viewModel with the download URL
-                    profileViewModel.updateCoverImage(url)
+                    viewModel.updateBackgroundImageUrl(url)
+                    Log.d("background_image"," background image successful ")
                 },
                 onFailure = { e ->
                     // Handle failure
@@ -278,23 +289,26 @@ fun UserProfileImage(profileViewModel: ProfileViewModel,modifier: Modifier = Mod
     }
 
 
-        val imagePickerLauncherProfile = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        ) { uri ->
-            if (uri != null) {
-                profilePicUri = uri
-                profileViewModel.uploadImageToFirebase(uri, "profile_image_${profileViewModel.profile.value.userName}",
-                    onSuccess = { url ->
-                        // Handle success, e.g., update the viewModel with the download URL
-                        profileViewModel.updateProfileImage(url)
-                    },
-                    onFailure = { e ->
-                        // Handle failure
-                        Log.e("Firebase", "Failed to upload image", e)
-                    }
-                )
-            }
+    val imagePickerLauncherProfile = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+           viewModel.updateProfilePic(uri)
+            viewModel.uploadImageToFirebase(uri,
+                "P",
+                onSuccess = { url ->
+                    // Handle success, e.g., update the viewModel with the download URL
+                    viewModel.updateProfilePicUrl(url)
+                    Log.d("profile_image"," profile image successful ")
+                },
+                onFailure = { e ->
+                    // Handle failure
+                    Log.e("Firebase", "Failed to upload image", e)
+                }
+            )
         }
+    }
+
 
     Box(
         modifier = modifier
@@ -333,58 +347,58 @@ fun UserProfileImage(profileViewModel: ProfileViewModel,modifier: Modifier = Mod
                 modifier = Modifier.size(32.dp)
             )
         }
+    }
 
-        // Profile image picker
-        val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
-        val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
+// Profile image picker
+    val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
+    val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
+    Box(
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-            ) {
-                bitmapProfilePic?.let {
-                    Image(
-                        bitmap = bitmapProfilePic.asImageBitmap(),
-                        contentDescription = "Profile image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center),
-                        contentScale = ContentScale.FillBounds
-                    )
-                } ?: run {
-                    Image(
-                        painter = painterResource(id = R.drawable.iconamoon_profile_fill),
-                        contentDescription = "Profile image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center),
-                    )
-                }
-            }
-
-            IconButton( // to select profile image
-                onClick = { imagePickerLauncherProfile.launch("image/*") },
-                modifier = Modifier
-                    .padding(
-                        end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
-                        bottom = 8.dp
-                    )
-                    .align(Alignment.BottomEnd)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.AddCircle,
-                    contentDescription = "Add icon",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+            bitmapProfilePic?.let {
+                Image(
+                    bitmap = bitmapProfilePic.asImageBitmap(),
+                    contentDescription = "Profile image",
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.Center),
+                    contentScale = ContentScale.FillBounds
+                )
+            } ?: run {
+                Image(
+                    painter = painterResource(id = R.drawable.iconamoon_profile_fill),
+                    contentDescription = "Profile image",
+                    modifier = Modifier
+                        .size(130.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.Center),
                 )
             }
+        }
+
+        IconButton( // to select profile image
+            onClick = { imagePickerLauncherProfile.launch("image/*") },
+            modifier = Modifier
+                .padding(
+                    end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
+                    bottom = 8.dp
+                )
+                .align(Alignment.BottomEnd)
+                .size(36.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AddCircle,
+                contentDescription = "Add icon",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
@@ -424,6 +438,6 @@ fun ContentBeforeLoading(modifier: Modifier = Modifier) {
 @Composable
 private fun PreviewProfileScreen() {
     ProfileScreen(
-         appNavController = rememberNavController()
+        appNavController = rememberNavController()
     )
 }

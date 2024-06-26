@@ -1,6 +1,8 @@
 package com.learn.sevasahyog.ngo_home.items.profile.domain
 
+
 import android.annotation.SuppressLint
+
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
+import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.network.RetrofitInstance
 import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.data.NgoService
@@ -27,28 +30,45 @@ import kotlinx.coroutines.tasks.await
 import okhttp3.Dispatcher
 
 class ProfileViewModel : ViewModel() {
+    private val _profilePicUrl = MutableStateFlow("")
+    val profilePicUrl get() = _profilePicUrl.asStateFlow()
+
+    fun updateProfilePicUrl(url: String) {
+        this._profilePicUrl.value = url
+    }
+    private val _backgroundImageUrl = MutableStateFlow("")
+    val backgroundImageUrl get() = _backgroundImageUrl.asStateFlow()
+
+    fun updateBackgroundImageUrl(url: String) {
+        this._backgroundImageUrl.value = url
+    }
+
 
     //userInfo data
-    //cover image
-    private val _coverImage = MutableStateFlow("")
-    val coverImage get() = _coverImage.asStateFlow()
 
-    fun updateCoverImage(coverImage: String) {
-        this._coverImage.value = coverImage
+    // Profile Pic
+    private val _profilePic = MutableStateFlow<Uri?>(null)
+    val profilePic get() = _profilePic.asStateFlow()
+
+    fun updateProfilePic(uri: Uri) {
+        this._profilePic.value = uri
     }
 
-    private val _profileImage = MutableStateFlow("")
-    val profileImage get() = _profileImage.asStateFlow()
 
-    fun updateProfileImage(profileImage: String) {
-        this._profileImage.value = profileImage
+    // Background Image
+    private val _backgroundImage = MutableStateFlow<Uri?>(null)
+    val backgroundImage get() = _backgroundImage
+
+    fun updateBackgroundImage(uri: Uri) {
+        this._backgroundImage.value = uri
     }
+
 
     // access token
     private val _accessToken = MutableStateFlow("")
     val accessToken get() = _accessToken
 
-    fun updateAccessToken(token: String){
+    fun updateAccessToken(token: String) {
         _accessToken.value = token
     }
 
@@ -56,7 +76,7 @@ class ProfileViewModel : ViewModel() {
     private val _userId = MutableStateFlow("")
     val userId get() = _userId.asStateFlow()
 
-    fun updateUserId(uid: String){
+    fun updateUserId(uid: String) {
         _userId.value = uid
     }
 
@@ -72,25 +92,26 @@ class ProfileViewModel : ViewModel() {
     private val _internetConnection = MutableStateFlow(true)
     val internetConnection get() = _internetConnection.asStateFlow()
 
-    private val handler = CoroutineExceptionHandler{ _, throwable ->
-//        if (throwable is )
+    private val handler = CoroutineExceptionHandler { _, throwable ->
         _internetConnection.value = false
         throwable.localizedMessage?.let { Log.e("error", it) }
     }
-    private val ngoService: NgoService = RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/").create(NgoService::class.java)
+    private val ngoService: NgoService =
+        RetrofitInstance.getClient(BASE_URL)
+            .create(NgoService::class.java)
 
-
-    fun loadProfile(){
+    fun loadProfile() {
         viewModelScope.launch(handler) {
             // if internet available
             _internetConnection.value = true
 
-            val userProfileResponse = ngoService.getUserProfile(token = "Bearer ${_accessToken.value}", _userId.value)
+            val userProfileResponse =
+                ngoService.getUserProfile(token = "Bearer ${_accessToken.value}", _userId.value)
 
             if (userProfileResponse.isSuccessful) {
                 _profile.value = userProfileResponse.body()!!
                 _userProfileProgress.value = false
-            } else{
+            } else {
                 val errorBody = userProfileResponse.errorBody()?.string()
                 Log.d("error_response_raw", errorBody ?: "No error body")
 
@@ -110,16 +131,25 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
+
     //function to upload image to firebase
-    fun uploadImageToFirebase(uri: Uri, fileName:String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit){
+    fun uploadImageToFirebase(
+        uri: Uri,
+        imageType: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         viewModelScope.launch {
             try {
-                val storageReference =FirebaseStorage.getInstance().reference
-                val fileRef = storageReference.child("profile_images/$fileName")
+                val storageReference = FirebaseStorage.getInstance().reference
+                val fileRef: StorageReference =
+                    if (imageType == "P") storageReference.child("${_userId.value}/Profile") else storageReference.child(
+                        "${_userId.value}/Background"
+                    )
                 fileRef.putFile(uri).await()
                 val downloadUrl = fileRef.downloadUrl.await().toString()
                 onSuccess(downloadUrl)
-            } catch (e:Exception){
+            } catch (e: Exception) {
                 onFailure(e)
             }
         }
@@ -128,10 +158,8 @@ class ProfileViewModel : ViewModel() {
 }
 
 
-data class ErrorResponse(val error: String){
+data class ErrorResponse(val error: String) {
 
 }
-
-
 
 

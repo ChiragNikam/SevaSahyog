@@ -7,14 +7,15 @@ import com.learn.sevasahyog.auth.data.dataclass.NgoAccount
 import com.learn.sevasahyog.auth.data.dataclass.SignInRequest
 import com.learn.sevasahyog.auth.data.dataclass.SignInResponseNgo
 import com.learn.sevasahyog.auth.data.dataclass.SignUpRequestNgo
+import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.network.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class AuthRepo {
-    val authService =
-        RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/").create(AuthService::class.java)
+    private val authService =
+        RetrofitInstance.getClient(BASE_URL).create(AuthService::class.java)
 
     suspend fun ngoSignIn(
         signInData: SignInRequest,
