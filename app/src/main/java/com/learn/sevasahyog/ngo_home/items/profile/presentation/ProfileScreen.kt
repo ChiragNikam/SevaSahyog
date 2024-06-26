@@ -117,7 +117,7 @@ fun ProfileScreen(
 
             // User Profile and Ngo Image
             UserProfileImage(
-              viewModel = viewModel,
+                viewModel = viewModel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp),
@@ -278,7 +278,7 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
                 onSuccess = { url ->
                     // Handle success, e.g., update the viewModel with the download URL
                     viewModel.updateBackgroundImageUrl(url)
-                    Log.d("background_image"," background image successful ")
+                    Log.d("background_image", " background image successful ")
                 },
                 onFailure = { e ->
                     // Handle failure
@@ -293,13 +293,13 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
-           viewModel.updateProfilePic(uri)
+            viewModel.updateProfilePic(uri)
             viewModel.uploadImageToFirebase(uri,
                 "P",
                 onSuccess = { url ->
                     // Handle success, e.g., update the viewModel with the download URL
                     viewModel.updateProfilePicUrl(url)
-                    Log.d("profile_image"," profile image successful ")
+                    Log.d("profile_image", " profile image successful ")
                 },
                 onFailure = { e ->
                     // Handle failure
@@ -314,7 +314,8 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
         modifier = modifier
     ) {
         // background image picker
-        val inputStreamBackGround = backGroundUri?.let { context.contentResolver.openInputStream(it) }
+        val inputStreamBackGround =
+            backGroundUri?.let { context.contentResolver.openInputStream(it) }
         val bitmapBackGround = BitmapFactory.decodeStream(inputStreamBackGround)
         bitmapBackGround?.let {
             Image(
@@ -347,60 +348,60 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
                 modifier = Modifier.size(32.dp)
             )
         }
-    }
-
-// Profile image picker
-    val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
-    val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
-    ) {
+        // Profile image picker
+        val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
+        val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
         Box(
-            modifier = Modifier
-                .size(140.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray)
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
         ) {
-            bitmapProfilePic?.let {
-                Image(
-                    bitmap = bitmapProfilePic.asImageBitmap(),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.Center),
-                    contentScale = ContentScale.FillBounds
-                )
-            } ?: run {
-                Image(
-                    painter = painterResource(id = R.drawable.iconamoon_profile_fill),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.Center),
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+            ) {
+                bitmapProfilePic?.let {
+                    Image(
+                        bitmap = bitmapProfilePic.asImageBitmap(),
+                        contentDescription = "Profile image",
+                        modifier = Modifier
+                            .size(130.dp)
+                            .clip(CircleShape)
+                            .align(Alignment.Center),
+                        contentScale = ContentScale.FillBounds
+                    )
+                } ?: run {
+                    Image(
+                        painter = painterResource(id = R.drawable.iconamoon_profile_fill),
+                        contentDescription = "Profile image",
+                        modifier = Modifier
+                            .size(130.dp)
+                            .clip(CircleShape)
+                            .align(Alignment.Center),
+                    )
+                }
+            }
+
+            IconButton( // to select profile image
+                onClick = { imagePickerLauncherProfile.launch("image/*") },
+                modifier = Modifier
+                    .padding(
+                        end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
+                        bottom = 8.dp
+                    )
+                    .align(Alignment.BottomEnd)
+                    .size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AddCircle,
+                    contentDescription = "Add icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
-
-        IconButton( // to select profile image
-            onClick = { imagePickerLauncherProfile.launch("image/*") },
-            modifier = Modifier
-                .padding(
-                    end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
-                    bottom = 8.dp
-                )
-                .align(Alignment.BottomEnd)
-                .size(36.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.AddCircle,
-                contentDescription = "Add icon",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
     }
+
 }
 
 @Composable
