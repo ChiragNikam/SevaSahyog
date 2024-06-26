@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface NgoService {
@@ -16,9 +17,15 @@ interface NgoService {
         @Path("id") id: String
     ): Response<NgoAccount>
 
+    @PUT("/account/ngo/updateImage/{id}")
+    suspend fun updateProfileBackgroundPic(
+        @Header("Authorization") token: String,
+        @Body updatePicsRequest: UpdatePicsRequest
+    ): Response<NgoAccount>
+
     @POST("/ngo/events")
     suspend fun createEvent(
         @Header("Authorization") token: String,
-        @Body createEventBody:CreateEvent
-    ):Response<EventResponse>
+        @Body createEventBody: CreateEvent
+    ): Response<EventResponse>
 }

@@ -1,37 +1,52 @@
 package com.learn.sevasahyog.common
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
@@ -131,7 +146,6 @@ fun ExpandableInfoRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialogView(
     onDismissRequest: () -> Unit,
@@ -174,6 +188,51 @@ fun AlertDialogView(
     )
 }
 
+@Composable
+fun ImageLoadDialogView(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    image: Uri?,
+){
+    val context = LocalContext.current
+
+    val inputStreamImage = image?.let { context.contentResolver.openInputStream(it) }
+    val bitmapImage = BitmapFactory.decodeStream(inputStreamImage)
+    Dialog(
+        onDismissRequest = { onDismissRequest() },
+    ) {
+        Column(
+            modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background, RoundedCornerShape(18.dp))
+        ) {
+            Image(
+                modifier = Modifier.fillMaxWidth().background(Color.Black.copy(0.5f)),
+                bitmap = bitmapImage.asImageBitmap(),
+                contentDescription = "Image Preview",
+                contentScale = ContentScale.FillWidth
+            )
+            Spacer(modifier = Modifier.height(22.dp))
+
+            Row(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+
+                OutlinedButton(onClick = { onDismissRequest() }) {
+                    Text(text = "Cancel")
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Button(onClick = {
+                    onConfirmation()
+                }) {
+                    Text(text = "Update")
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun DialogPreview() {
@@ -184,6 +243,20 @@ private fun DialogPreview() {
             dialogTitle = "Alert",
             dialogText = "Are you sure that you want to dismiss. If you do so you will not be able to save the event.",
             icon = Icons.Filled.Build
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DialogImagePreview() {
+    SevaSahyogTheme {
+        ImageLoadDialogView(
+            onDismissRequest = { /*TODO*/ },
+            onConfirmation = { /*TODO*/ },
+            dialogTitle = "Alert",
+            dialogText = "Are you sure that you want to dismiss. If you do so you will not be able to save the event.",
+            image = null
         )
     }
 }
