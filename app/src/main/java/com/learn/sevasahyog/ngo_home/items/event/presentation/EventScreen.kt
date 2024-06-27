@@ -103,7 +103,7 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
                     ) {
                         items(8){ index ->
                             PastEvent(eventYear = "202$index", onClick = {
-                                appNavController.navigate("event/eventDetailScreen")
+                                appNavController.navigate("event/viewEventScreen")
                             })
                         }
                         item { Spacer(modifier = Modifier.height(12.dp)) }

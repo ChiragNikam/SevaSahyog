@@ -15,6 +15,8 @@ import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
 import com.learn.sevasahyog.ngo_home.items.event.presentation.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.presentation.EventDetailScreen
+import com.learn.sevasahyog.ngo_home.items.event.presentation.EventItemByYear
+import com.learn.sevasahyog.ngo_home.items.event.presentation.ViewEventsScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
 @Composable
@@ -82,6 +84,22 @@ fun AppNavigation(navController: NavHostController, isLoggedIn: Boolean) {
                 ) {
                     EventDetailScreen(navController = navController)
                 }
+                composable(
+                    route="event/viewEventScreen",
+                    enterTransition = {inHorizontal},
+                    popExitTransition = {outHorizontal}
+                ) {
+                        ViewEventsScreen(appNavController = navController)
+                    }
+
+                composable(
+                    route="event/eventItemByYearScreen",
+                    enterTransition = {inHorizontal},
+                    popExitTransition = {outHorizontal}
+                ) {
+                   EventItemByYear(appNavController = navController)
+                }
+
             }
         }
     }
