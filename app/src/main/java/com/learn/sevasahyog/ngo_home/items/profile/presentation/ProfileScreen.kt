@@ -30,6 +30,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +56,7 @@ import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
+import com.learn.sevasahyog.common.ImageLoadDialogView
 import com.learn.sevasahyog.ngo_home.items.profile.domain.ProfileViewModel
 import kotlinx.coroutines.launch
 
@@ -117,7 +120,7 @@ fun ProfileScreen(
 
             // User Profile and Ngo Image
             UserProfileImage(
-              viewModel = viewModel,
+                viewModel = viewModel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp),
@@ -256,6 +259,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
+
     }
 }
 
@@ -264,6 +268,13 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
+    val showPreviewDialog = rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    val localBackgroundUri = rememberSaveable {
+        mutableStateOf<Uri?>(null)
+    }
 
     val backGroundUri by viewModel.backgroundImage.collectAsState()
     val profilePicUri by viewModel.profilePic.collectAsState()
@@ -273,53 +284,74 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
     ) { uri ->
 
         if (uri != null) {
-            viewModel.updateBackgroundImage(uri)
-            viewModel.uploadImageToFirebase(uri, "B",
-                onSuccess = { url ->
-                    // Handle success, e.g., update the viewModel with the download URL
-                    viewModel.updateBackgroundImageUrl(url)
-                    Log.d("background_image"," background image successful ")
-                },
-                onFailure = { e ->
-                    // Handle failure
-                    Log.e("Firebase", "Failed to upload image", e)
-                }
-            )
+            localBackgroundUri.value = uri
+            showPreviewDialog.value = true
         }
     }
 
+    val lifecycle = rememberCoroutineScope()
 
     val imagePickerLauncherProfile = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
-           viewModel.updateProfilePic(uri)
-            viewModel.uploadImageToFirebase(uri,
-                "P",
-                onSuccess = { url ->
-                    // Handle success, e.g., update the viewModel with the download URL
-                    viewModel.updateProfilePicUrl(url)
-                    Log.d("profile_image"," profile image successful ")
-                },
-                onFailure = { e ->
-                    // Handle failure
-                    Log.e("Firebase", "Failed to upload image", e)
-                }
-            )
+            lifecycle.launch {
+                viewModel.updateProfilePic(uri)
+                viewModel.uploadImageToFirebase(uri,
+                    "P",
+                    onSuccess = { url ->
+                        // Handle success, e.g., update the viewModel with the download URL
+                        viewModel.updateProfilePicUrl(url)
+                        Log.d("profile_image", " profile image successful ")
+                    },
+                    onFailure = { e ->
+                        // Handle failure
+                        Log.e("Firebase", "Failed to upload image", e)
+                    }
+                )
+            }
         }
     }
 
+    // dialog for preview of image
+    if (showPreviewDialog.value)
+        ImageLoadDialogView(
+            onDismissRequest = { showPreviewDialog.value = false },
+            onConfirmation = {
+                localBackgroundUri.value?.let { viewModel.updateBackgroundImage(it) }
+                backGroundUri?.let {
+                    lifecycle.launch {
+                        viewModel.uploadImageToFirebase(it, "B",
+                            onSuccess = { url ->
+                                // Handle success, e.g., update the viewModel with the download URL
+                                viewModel.updateBackgroundImageUrl(url)
+                                Log.d("background_image", " background image successful ")
+                            },
+                            onFailure = { e ->
+                                // Handle failure
+                                Log.e("Firebase", "Failed to upload image", e)
+                            }
+                        )
+                        showPreviewDialog.value = false
+                    }
+                }
+            },
+            dialogTitle = "",
+            dialogText = "",
+            image = localBackgroundUri.value
+        )
 
     Box(
         modifier = modifier
     ) {
         // background image picker
-        val inputStreamBackGround = backGroundUri?.let { context.contentResolver.openInputStream(it) }
+        val inputStreamBackGround =
+            backGroundUri?.let { context.contentResolver.openInputStream(it) }
         val bitmapBackGround = BitmapFactory.decodeStream(inputStreamBackGround)
         bitmapBackGround?.let {
             Image(
                 bitmap = it.asImageBitmap(),
-                contentDescription = "Cover image",
+                contentDescription = "Background image",
                 modifier = Modifier
                     .padding(bottom = 70.dp)
                     .fillMaxSize(),
@@ -347,60 +379,60 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
                 modifier = Modifier.size(32.dp)
             )
         }
-    }
-
-// Profile image picker
-    val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
-    val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
-    ) {
+        // Profile image picker
+        val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
+        val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
         Box(
-            modifier = Modifier
-                .size(140.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray)
+            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
         ) {
-            bitmapProfilePic?.let {
-                Image(
-                    bitmap = bitmapProfilePic.asImageBitmap(),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.Center),
-                    contentScale = ContentScale.FillBounds
-                )
-            } ?: run {
-                Image(
-                    painter = painterResource(id = R.drawable.iconamoon_profile_fill),
-                    contentDescription = "Profile image",
-                    modifier = Modifier
-                        .size(130.dp)
-                        .clip(CircleShape)
-                        .align(Alignment.Center),
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+            ) {
+                bitmapProfilePic?.let {
+                    Image(
+                        bitmap = bitmapProfilePic.asImageBitmap(),
+                        contentDescription = "Profile image",
+                        modifier = Modifier
+                            .size(130.dp)
+                            .clip(CircleShape)
+                            .align(Alignment.Center),
+                        contentScale = ContentScale.FillBounds
+                    )
+                } ?: run {
+                    Image(
+                        painter = painterResource(id = R.drawable.iconamoon_profile_fill),
+                        contentDescription = "Profile image",
+                        modifier = Modifier
+                            .size(130.dp)
+                            .clip(CircleShape)
+                            .align(Alignment.Center),
+                    )
+                }
+            }
+
+            IconButton( // to select profile image
+                onClick = { imagePickerLauncherProfile.launch("image/*") },
+                modifier = Modifier
+                    .padding(
+                        end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
+                        bottom = 8.dp
+                    )
+                    .align(Alignment.BottomEnd)
+                    .size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AddCircle,
+                    contentDescription = "Add icon",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }
-
-        IconButton( // to select profile image
-            onClick = { imagePickerLauncherProfile.launch("image/*") },
-            modifier = Modifier
-                .padding(
-                    end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
-                    bottom = 8.dp
-                )
-                .align(Alignment.BottomEnd)
-                .size(36.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.AddCircle,
-                contentDescription = "Add icon",
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
     }
+
 }
 
 @Composable

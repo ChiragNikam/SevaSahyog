@@ -36,6 +36,7 @@ class ProfileViewModel : ViewModel() {
     fun updateProfilePicUrl(url: String) {
         this._profilePicUrl.value = url
     }
+
     private val _backgroundImageUrl = MutableStateFlow("")
     val backgroundImageUrl get() = _backgroundImageUrl.asStateFlow()
 
@@ -133,14 +134,15 @@ class ProfileViewModel : ViewModel() {
 
 
     //function to upload image to firebase
-    fun uploadImageToFirebase(
+    suspend fun uploadImageToFirebase(
         uri: Uri,
         imageType: String,
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        viewModelScope.launch {
-            try {
+
+        try {
+            viewModelScope.launch {
                 val storageReference = FirebaseStorage.getInstance().reference
                 val fileRef: StorageReference =
                     if (imageType == "P") storageReference.child("${_userId.value}/Profile") else storageReference.child(
@@ -149,9 +151,9 @@ class ProfileViewModel : ViewModel() {
                 fileRef.putFile(uri).await()
                 val downloadUrl = fileRef.downloadUrl.await().toString()
                 onSuccess(downloadUrl)
-            } catch (e: Exception) {
-                onFailure(e)
             }
+        } catch (e: Exception) {
+            onFailure(e)
         }
 
     }
