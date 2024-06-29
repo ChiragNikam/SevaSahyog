@@ -45,7 +45,7 @@ class EventViewModel : ViewModel() {
         .create(NgoService::class.java)
 
     // Function to create event
-  suspend   fun createEvent() {
+     fun createEvent() {
         viewModelScope.launch {
             try {
                 val createEvent =CreateEvent(_email.value,_event.value)

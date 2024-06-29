@@ -2,6 +2,7 @@ package com.learn.sevasahyog.common
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,13 +27,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +53,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun DataViewInCard(
@@ -195,7 +204,7 @@ fun ImageLoadDialogView(
     dialogTitle: String,
     dialogText: String,
     image: Uri?,
-){
+) {
     val context = LocalContext.current
 
     val inputStreamImage = image?.let { context.contentResolver.openInputStream(it) }
@@ -205,19 +214,23 @@ fun ImageLoadDialogView(
     ) {
         Column(
             modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.background, RoundedCornerShape(18.dp))
+                .background(color = MaterialTheme.colorScheme.background, RoundedCornerShape(18.dp))
         ) {
             Image(
-                modifier = Modifier.fillMaxWidth().background(Color.Black.copy(0.5f)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(0.5f)),
                 bitmap = bitmapImage.asImageBitmap(),
                 contentDescription = "Image Preview",
                 contentScale = ContentScale.FillWidth
             )
             Spacer(modifier = Modifier.height(22.dp))
 
-            Row(modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.End
+            ) {
 
                 OutlinedButton(onClick = { onDismissRequest() }) {
                     Text(text = "Cancel")
@@ -265,4 +278,78 @@ private fun DialogImagePreview() {
 @Composable
 private fun DataViewInCardPrev() {
     DataViewInCard(image = Icons.Filled.Face, info = "Chirag Nikam", infoDesc = "Name")
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerDialog(
+    onDismissRequest: () -> Unit,
+    selectedDate: MutableState<String>,
+    dateFormat: SimpleDateFormat,
+    selectedDateValue: Date
+) {
+    val datePickerState = rememberDatePickerState()
+
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties()
+    ) {
+        Surface(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                DatePicker(
+                    state = datePickerState,
+                    title = {
+                        Text("Select a date")
+                    },
+                    showModeToggle = true,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextButton(onClick = { onDismissRequest() }) {
+                        Text("Cancel")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(
+                        onClick = {
+                           selectedDate.value = dateFormat.format(
+                                Date(
+                                    datePickerState.selectedDateMillis ?: selectedDateValue.time
+                                )
+                            )
+                            Log.d("date", "newSelected date : ${selectedDate.value}")
+                            onDismissRequest()
+
+                        }
+                    ) {
+                        Text("Ok")
+                    }
+                }
+            }
+        }
+    }
+}
+
+fun getDateComponents(dateString: String): Triple<Int, Int, Int> {
+    // Split the date string by the separator "/"
+    val dateParts = dateString.split("/")
+    // Extract the year, month, and day from the split parts
+    val year = dateParts[0].toInt()
+    val month = dateParts[1].toInt()
+    val day = dateParts[2].toInt()
+Log.d("parsing date","getDateComponents")
+    // Return the components as a Triple
+    return Triple(day, month, year)
 }
