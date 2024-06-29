@@ -282,7 +282,6 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
     val imagePickerLauncherBackground = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-
         if (uri != null) {
             localBackgroundUri.value = uri
             showPreviewDialog.value = true
@@ -313,7 +312,7 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
         }
     }
 
-    // dialog for preview of image
+    // dialog for preview of background image
     if (showPreviewDialog.value)
         ImageLoadDialogView(
             onDismissRequest = { showPreviewDialog.value = false },
@@ -325,7 +324,8 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
                             onSuccess = { url ->
                                 // Handle success, e.g., update the viewModel with the download URL
                                 viewModel.updateBackgroundImageUrl(url)
-                                Log.d("background_image", " background image successful ")
+                                Log.d("background_image", "url: $url")
+                                viewModel.updatePics()
                             },
                             onFailure = { e ->
                                 // Handle failure

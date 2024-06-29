@@ -20,8 +20,9 @@ interface NgoService {
     @PUT("/account/ngo/updateImage/{id}")
     suspend fun updateProfileBackgroundPic(
         @Header("Authorization") token: String,
+        @Path("id") id: String,
         @Body updatePicsRequest: UpdatePicsRequest
-    ): Response<NgoAccount>
+    ): Response<Any>
 
     @POST("/ngo/events")
     suspend fun createEvent(

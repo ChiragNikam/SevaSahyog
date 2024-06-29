@@ -1,18 +1,11 @@
 package com.learn.sevasahyog.ngo_home.items.profile.domain
 
-
-import android.annotation.SuppressLint
-
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
@@ -20,14 +13,13 @@ import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.network.RetrofitInstance
 import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.data.NgoService
+import com.learn.sevasahyog.ngo_home.data.UpdatePicsRequest
+import com.learn.sevasahyog.ngo_home.repo.ProfileRepo
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import okhttp3.Dispatcher
 
 class ProfileViewModel : ViewModel() {
     private val _profilePicUrl = MutableStateFlow("")
@@ -43,7 +35,6 @@ class ProfileViewModel : ViewModel() {
     fun updateBackgroundImageUrl(url: String) {
         this._backgroundImageUrl.value = url
     }
-
 
     //userInfo data
 
@@ -132,7 +123,6 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-
     //function to upload image to firebase
     suspend fun uploadImageToFirebase(
         uri: Uri,
@@ -151,17 +141,32 @@ class ProfileViewModel : ViewModel() {
                 fileRef.putFile(uri).await()
                 val downloadUrl = fileRef.downloadUrl.await().toString()
                 onSuccess(downloadUrl)
+                fileRef.delete()
             }
         } catch (e: Exception) {
             onFailure(e)
         }
+    }
 
+    val profileRepo = ProfileRepo()
+
+    // update profile and background pic response
+    fun updatePics() {
+        viewModelScope.launch {
+            val requestBody = UpdatePicsRequest(    // build request
+                profilePicUrl = profilePicUrl.value,
+                backgroundPicUrl = backgroundImageUrl.value
+            )
+            val response = profileRepo.updateProfileBackgroundPic(
+                token = accessToken.value,
+                userId = userId.value,
+                requestBody
+            )
+            if (response is NgoAccount){
+                Log.d("update_pics_success", response.toString())
+            } else {
+                Log.e("update_pics_failed", response.toString())
+            }
+        }
     }
 }
-
-
-data class ErrorResponse(val error: String) {
-
-}
-
-
