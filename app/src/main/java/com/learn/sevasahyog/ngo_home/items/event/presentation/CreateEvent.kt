@@ -1,6 +1,8 @@
 package com.learn.sevasahyog.ngo_home.items.event.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,7 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.common.getDateComponents
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
+import java.sql.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun CreateEvent(
@@ -68,7 +74,10 @@ fun CreateEvent(
 
             // Save Button
             Button(
-                onClick = { },
+                onClick = {
+                    viewModel.createEvent()
+                    appNavController.navigateUp()
+                          },
                 modifier = Modifier.align(Alignment.CenterVertically),
 
                 ) {
@@ -87,21 +96,44 @@ fun CreateEvent(
             label = "Event Name",
             leadingIcon = Icons.Default.Info
         )
+        var datePickerVisible by remember { mutableStateOf(false) }
+        var selectedDate = remember { mutableStateOf("") }
+        var newSelectedDate =selectedDate.value
+        //  Event Date
+        LabeledTextField(
+            value = newSelectedDate,
+            onValueChange = {
+                val (day, month, year)= getDateComponents(newSelectedDate)
+                viewModel.updateEvent {
+                    it.copy(dd=day , mm = month ,yyyy=year)
+                }
+                Log.d("event_date","${event.dd} /${event.mm }/${event.yyyy}")
+            },
 
-        // Event Date
-//            LabeledTextField(
-//                value = event.dd ,
-//                onValueChange = { eventDate },
-//                label = "Event Date",
-//                leadingIcon = Icons.Default.DateRange,
-//                trailingIcon = {
-//                    Icon(
-//                        imageVector = Icons.Default.DateRange,
-//                        contentDescription = "Calendar"
-//                    )
-//                }
-//            )
-
+            label = "Event Date",
+            leadingIcon = Icons.Default.DateRange,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Calendar",
+                    modifier = Modifier.clickable {
+                        datePickerVisible = true
+                    }
+                )
+            }
+        )
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        var selectedDateValue by remember { mutableStateOf(java.util.Date()) }
+        if (datePickerVisible)
+            com.learn.sevasahyog.common.DatePickerDialog(
+                onDismissRequest = {
+                    Log.d("selectedDate", "${selectedDate.value}")
+                    datePickerVisible = false
+                },
+                selectedDate = selectedDate,
+                dateFormat = dateFormat,
+                selectedDateValue = selectedDateValue
+            )
         // Event Location
         LabeledTextField(
             value = event.location,
@@ -122,14 +154,18 @@ fun CreateEvent(
             leadingIcon = Icons.Default.Person
         )
 
-//            // Organizer Mobile No.
-//            LabeledTextField(dd
-//                value = organizerMobileNo,
-//                onValueChange = { organizerMobileNo },
-//                label = "Organizer Mobile No.",
-//                leadingIcon = Icons.Default.Phone,
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-//            )
+        // Organizer Mobile No.
+        LabeledTextField(
+            value = event.organizerPhone,
+            onValueChange = { organizerPhone ->
+                viewModel.updateEvent {
+                    it.copy(organizerPhone = organizerPhone)
+                }
+            },
+            label = "Organizer Mobile No.",
+            leadingIcon = Icons.Default.Phone,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        )
 
         // Short Description
         LabeledTextField(
@@ -146,7 +182,8 @@ fun CreateEvent(
         LabeledTextField(
             value = event.longDesc,
             onValueChange = { longDesc ->
-                viewModel.updateEvent { it.copy(longDesc = longDesc) } },
+                viewModel.updateEvent { it.copy(longDesc = longDesc) }
+            },
             label = "Long Description",
             leadingIcon = Icons.Default.List,
             maxLines = 5

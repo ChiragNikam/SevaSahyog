@@ -1,6 +1,6 @@
 package com.learn.sevasahyog.ngo_home.repo
 
-import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
+import com.learn.sevasahyog.data.ErrorResponse
 import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.network.RetrofitInstance
 import com.learn.sevasahyog.ngo_home.data.NgoService

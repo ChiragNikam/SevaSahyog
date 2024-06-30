@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
+import com.learn.sevasahyog.data.ErrorResponse
 import com.learn.sevasahyog.auth.data.dataclass.SignInRequest
 import com.learn.sevasahyog.auth.repo.AuthRepo
 import kotlinx.coroutines.flow.MutableStateFlow

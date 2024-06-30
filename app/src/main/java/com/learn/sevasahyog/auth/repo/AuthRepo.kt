@@ -1,8 +1,6 @@
 package com.learn.sevasahyog.auth.repo
 
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.learn.sevasahyog.auth.data.AuthService
-import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
 import com.learn.sevasahyog.auth.data.dataclass.NgoAccount
 import com.learn.sevasahyog.auth.data.dataclass.SignInRequest
 import com.learn.sevasahyog.auth.data.dataclass.SignInResponseNgo

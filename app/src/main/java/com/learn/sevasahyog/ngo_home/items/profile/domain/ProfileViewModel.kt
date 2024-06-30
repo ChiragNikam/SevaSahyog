@@ -8,7 +8,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
-import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
+import com.learn.sevasahyog.data.ErrorResponse
 import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.network.RetrofitInstance
 import com.learn.sevasahyog.ngo_home.data.NgoAccount

@@ -31,9 +31,3 @@ data class CreateEvent(
     var email: String = "",
     var event: EventRequest = EventRequest()
 )
-
-data class EventDate(
-    var dd: Int = 0,
-    var mm: Int = 0,
-    var yyyy: Int = 0
-)
