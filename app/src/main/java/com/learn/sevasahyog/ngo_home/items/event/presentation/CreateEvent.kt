@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.getDateComponents
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
 import java.sql.Date
@@ -32,6 +34,13 @@ fun CreateEvent(
     appNavController: NavController,
     viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    val context = LocalContext.current
+
+    val session = SessionManager(context)
+    val data = session.getUserDetails()
+    data["email"]?.let { viewModel.updateEmail(it) }    // set the email for create event request
+    data["token"]?.let { viewModel.updateAccessToken(it) }  // set access token
+
     Column(
         modifier = Modifier
             .fillMaxSize()

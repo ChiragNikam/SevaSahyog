@@ -52,6 +52,7 @@ class EventViewModel : ViewModel() {
                     token = "Bearer ${_accessToken.value}",
                     createEventBody = createEvent
                 )
+                Log.d("create_event_body", createEvent.toString())
 
                 if (eventResponse.isSuccessful) {
                     val savedEvent =eventResponse.body()
