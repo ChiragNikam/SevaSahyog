@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Face
@@ -32,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -283,12 +285,12 @@ private fun DataViewInCardPrev() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDialog(
+fun SevaSehyogDatePicker(
     onDismissRequest: () -> Unit,
     selectedDate: MutableState<String>,
     dateFormat: SimpleDateFormat,
     selectedDateValue: Date
-) {
+): String {
     val datePickerState = rememberDatePickerState()
 
     Dialog(
@@ -340,15 +342,51 @@ fun DatePickerDialog(
             }
         }
     }
+
+    return selectedDate.value
+}
+
+@Composable
+fun LabeledTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    leadingIcon: ImageVector,
+    modifier: Modifier = Modifier,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    maxLines: Int = 1
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Icon(
+            imageVector = leadingIcon,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            modifier = Modifier.weight(1f),
+            trailingIcon = trailingIcon,
+            keyboardOptions = keyboardOptions,
+            maxLines = maxLines
+        )
+
+    }
 }
 
 fun getDateComponents(dateString: String): Triple<Int, Int, Int> {
     // Split the date string by the separator "/"
     val dateParts = dateString.split("/")
     // Extract the year, month, and day from the split parts
-    val year = dateParts[0].toInt()
+    val year = dateParts[2].toInt()
     val month = dateParts[1].toInt()
-    val day = dateParts[2].toInt()
+    val day = dateParts[0].toInt()
 Log.d("parsing date","getDateComponents")
     // Return the components as a Triple
     return Triple(day, month, year)
