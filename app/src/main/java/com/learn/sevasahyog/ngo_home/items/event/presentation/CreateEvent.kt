@@ -1,6 +1,7 @@
 package com.learn.sevasahyog.ngo_home.items.event.presentation
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,7 +46,7 @@ fun CreateEvent(
     data["email"]?.let { viewModel.updateEmail(it) }    // set the email for create event request
     data["token"]?.let { viewModel.updateAccessToken(it) }  // set access token
 
-    Scaffold (
+    Scaffold(
         topBar = {
             Row(
                 modifier = Modifier
@@ -54,7 +56,10 @@ fun CreateEvent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Close Icon
-                IconButton(onClick = { appNavController.navigateUp() }) {
+                IconButton(onClick = {
+                    appNavController.navigateUp()
+                    viewModel.clearData()
+                }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
@@ -79,17 +84,21 @@ fun CreateEvent(
                 Button(
                     onClick = {
                         viewModel.createEvent()
-                        appNavController.navigateUp()
                     },
-                    modifier = Modifier.align(Alignment.CenterVertically),
-
-                    ) {
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) {
                     Text("Save", fontSize = 16.sp)
                 }
             }
         }
-    ){
-
+    ) {
+        val savedEventSuccess by viewModel.saveEventSuccess.collectAsState()
+        if (savedEventSuccess) {
+            Toast.makeText(context, "Event Saved successfully", Toast.LENGTH_SHORT).show()
+            viewModel.updateSaveEventSuccess(false)
+            appNavController.navigateUp()
+            appNavController.navigate("event/eventDetailScreen")
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -212,10 +221,9 @@ fun CreateEvent(
                     viewModel.updateEvent { it.copy(longDesc = longDesc) }
                 },
                 label = "Long Description",
-                leadingIcon = Icons.Default.List,
+                leadingIcon = Icons.AutoMirrored.Filled.List,
                 maxLines = 5
             )
-
         }
     }
 }

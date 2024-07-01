@@ -17,12 +17,12 @@ interface NgoService {
         @Path("id") id: String
     ): Response<NgoAccount>
 
-    @PUT("/account/ngo/updateImage/{id}")
+    @PUT("/account/ngo/updateImage/{userId}")
     suspend fun updateProfileBackgroundPic(
         @Header("Authorization") token: String,
-        @Path("id") id: String,
+        @Path("userId") id: String,
         @Body updatePicsRequest: UpdatePicsRequest
-    ): Response<Any>
+    ): Response<NgoAccount>
 
     @POST("/ngo/events")
     suspend fun createEvent(

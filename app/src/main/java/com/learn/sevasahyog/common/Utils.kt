@@ -387,7 +387,6 @@ fun getDateComponents(dateString: String): Triple<Int, Int, Int> {
     val year = dateParts[2].toInt()
     val month = dateParts[1].toInt()
     val day = dateParts[0].toInt()
-Log.d("parsing date","getDateComponents")
     // Return the components as a Triple
     return Triple(day, month, year)
 }

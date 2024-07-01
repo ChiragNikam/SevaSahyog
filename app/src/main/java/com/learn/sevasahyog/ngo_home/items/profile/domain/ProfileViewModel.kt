@@ -138,17 +138,21 @@ class ProfileViewModel : ViewModel() {
                     if (imageType == "P") storageReference.child("${_userId.value}/Profile") else storageReference.child(
                         "${_userId.value}/Background"
                     )
-                fileRef.putFile(uri).await()
+                val response = fileRef.putFile(uri).await()
+                if (response.task.isSuccessful){
+                    Log.d("image_upload", "Image uploaded successfully")
+                } else{
+                    Log.d("uploadError", response.error.toString())
+                }
                 val downloadUrl = fileRef.downloadUrl.await().toString()
                 onSuccess(downloadUrl)
-                fileRef.delete()
             }
         } catch (e: Exception) {
             onFailure(e)
         }
     }
 
-    val profileRepo = ProfileRepo()
+    private val profileRepo = ProfileRepo()
 
     // update profile and background pic response
     fun updatePics() {
@@ -157,8 +161,8 @@ class ProfileViewModel : ViewModel() {
                 profilePicUrl = profilePicUrl.value,
                 backgroundPicUrl = backgroundImageUrl.value
             )
-            val response = profileRepo.updateProfileBackgroundPic(
-                token = accessToken.value,
+            val response = profileRepo.updateProfileBackgroundPic(  // do api call
+                token = "Bearer ${accessToken.value}",
                 userId = userId.value,
                 requestBody
             )

@@ -10,7 +10,7 @@ data class EventRequest(
     var dd: Int = 0,
     var mm: Int = 0,
     var yyyy: Int = 0,
-    var status: Int = 0
+    var status: Int = 2
 )
 
 data class EventResponse(
@@ -19,13 +19,13 @@ data class EventResponse(
     var longDesc: String = "",
     var shortDesc: String = "",
     var organizer: String = "",
+    var organizerPhone: String = "",
     var location: String = "",
     var dd: Int = 0,
     var mm: Int = 0,
     var yyyy: Int = 0,
     var status: Int = 0
 )
-
 
 data class CreateEvent(
     var email: String = "",
