@@ -23,7 +23,7 @@ interface NgoService {
         @Body updatePicsRequest: UpdatePicsRequest
     ): Response<NgoAccount>
 
-    @POST("/ngo/events")
+    @POST("ngo/events")
     suspend fun createEvent(
         @Header("Authorization") token: String,
         @Body createEventBody: CreateEvent

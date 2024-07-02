@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
+import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.network.RetrofitInstance
 import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.data.NgoService
@@ -37,17 +38,19 @@ class EventViewModel : ViewModel() {
     private val _event = MutableStateFlow(EventRequest())
     val event get() = _event.asStateFlow()
 
+
     fun updateEvent(update: (EventRequest) -> EventRequest) {
         _event.value = update(_event.value)
     }
 
-    private val ngoService = RetrofitInstance.getClient("https://sevasahyogapi.azurewebsites.net/")
+    private val ngoService = RetrofitInstance.getClient(BASE_URL)
         .create(NgoService::class.java)
 
     // Function to create event
      fun createEvent() {
         viewModelScope.launch {
             try {
+                Log.d("create_event","event response ${_event.value}")
                 val createEvent =CreateEvent(_email.value,_event.value)
                 val eventResponse = ngoService.createEvent(
                     token = "Bearer ${_accessToken.value}",
