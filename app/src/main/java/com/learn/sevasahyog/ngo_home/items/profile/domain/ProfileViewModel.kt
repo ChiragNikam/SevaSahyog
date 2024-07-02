@@ -22,14 +22,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class ProfileViewModel : ViewModel() {
-    private val _profilePicUrl = MutableStateFlow("")
+    private val _profilePicUrl = MutableStateFlow<String?>(null)
     val profilePicUrl get() = _profilePicUrl.asStateFlow()
 
     fun updateProfilePicUrl(url: String) {
         this._profilePicUrl.value = url
     }
 
-    private val _backgroundImageUrl = MutableStateFlow("")
+    private val _backgroundImageUrl = MutableStateFlow<String?>(null)
     val backgroundImageUrl get() = _backgroundImageUrl.asStateFlow()
 
     fun updateBackgroundImageUrl(url: String) {
@@ -37,24 +37,6 @@ class ProfileViewModel : ViewModel() {
     }
 
     //userInfo data
-
-    // Profile Pic
-    private val _profilePic = MutableStateFlow<Uri?>(null)
-    val profilePic get() = _profilePic.asStateFlow()
-
-    fun updateProfilePic(uri: Uri) {
-        this._profilePic.value = uri
-    }
-
-
-    // Background Image
-    private val _backgroundImage = MutableStateFlow<Uri?>(null)
-    val backgroundImage get() = _backgroundImage
-
-    fun updateBackgroundImage(uri: Uri) {
-        this._backgroundImage.value = uri
-    }
-
 
     // access token
     private val _accessToken = MutableStateFlow("")
@@ -167,9 +149,9 @@ class ProfileViewModel : ViewModel() {
                 requestBody
             )
             if (response is NgoAccount){
-                Log.d("update_pics_success", response.toString())
+                Log.d("update_pics", "success: $response")
             } else {
-                Log.e("update_pics_failed", response.toString())
+                Log.e("update_pics", response.toString())
             }
         }
     }

@@ -1,11 +1,9 @@
 package com.learn.sevasahyog.ngo_home.items.profile.presentation
 
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -42,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,6 +56,7 @@ import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.common.ImageLoadDialogView
+import com.learn.sevasahyog.common.LoadImageFromUrl
 import com.learn.sevasahyog.ngo_home.items.profile.domain.ProfileViewModel
 import kotlinx.coroutines.launch
 
@@ -268,6 +268,11 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
+
+    val imageType = rememberSaveable {   // P: Profile, B: Background
+        mutableStateOf("")
+    }
+
     val showPreviewDialog = rememberSaveable {
         mutableStateOf(false)
     }
@@ -276,8 +281,9 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
         mutableStateOf<Uri?>(null)
     }
 
-    val backGroundUri by viewModel.backgroundImage.collectAsState()
-    val profilePicUri by viewModel.profilePic.collectAsState()
+    val localProfileUri = rememberSaveable {
+        mutableStateOf<Uri?>(null)
+    }
 
     val imagePickerLauncherBackground = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -295,19 +301,8 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
     ) { uri ->
         if (uri != null) {
             lifecycle.launch {
-                viewModel.updateProfilePic(uri)
-                viewModel.uploadImageToFirebase(uri,
-                    "P",
-                    onSuccess = { url ->
-                        // Handle success, e.g., update the viewModel with the download URL
-                        viewModel.updateProfilePicUrl(url)
-                        Log.d("profile_image", " profile image successful ")
-                    },
-                    onFailure = { e ->
-                        // Handle failure
-                        Log.e("Firebase", "Failed to upload image", e)
-                    }
-                )
+                localProfileUri.value = uri
+                showPreviewDialog.value = true
             }
         }
     }
@@ -317,58 +312,55 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
         ImageLoadDialogView(
             onDismissRequest = { showPreviewDialog.value = false },
             onConfirmation = {
-                localBackgroundUri.value?.let { viewModel.updateBackgroundImage(it) }
-                backGroundUri?.let {
-                    lifecycle.launch {
-                        viewModel.uploadImageToFirebase(it, "B",
+                lifecycle.launch {
+                    (if (imageType.value == "B") localBackgroundUri.value else localProfileUri.value)?.let {
+                        viewModel.uploadImageToFirebase(
+                            uri = it,
+                            imageType.value,
                             onSuccess = { url ->
                                 // Handle success, e.g., update the viewModel with the download URL
-                                viewModel.updateBackgroundImageUrl(url)
-                                Log.d("background_image", "url: $url")
+                                if (imageType.value == "B") {
+                                    viewModel.updateBackgroundImageUrl(url)
+                                } else {
+                                    viewModel.updateProfilePicUrl(url)
+                                }
                                 viewModel.updatePics()
+                                viewModel.loadProfile()
                             },
                             onFailure = { e ->
                                 // Handle failure
                                 Log.e("Firebase", "Failed to upload image", e)
                             }
                         )
-                        showPreviewDialog.value = false
                     }
+                    showPreviewDialog.value = false
                 }
             },
             dialogTitle = "",
             dialogText = "",
-            image = localBackgroundUri.value
+            image = if (imageType.value == "B") localBackgroundUri.value else localProfileUri.value
         )
 
     Box(
         modifier = modifier
     ) {
-        // background image picker
-        val inputStreamBackGround =
-            backGroundUri?.let { context.contentResolver.openInputStream(it) }
-        val bitmapBackGround = BitmapFactory.decodeStream(inputStreamBackGround)
-        bitmapBackGround?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                contentDescription = "Background image",
-                modifier = Modifier
-                    .padding(bottom = 70.dp)
-                    .fillMaxSize(),
-                contentScale = ContentScale.FillBounds
-            )
-        } ?: run {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Default Cover image",
-                modifier = Modifier
-                    .padding(bottom = 70.dp)
-                    .fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
+        // background image
+        val ngoAccount by viewModel.profile.collectAsState()
+        val backgroundPic by viewModel.backgroundImageUrl.collectAsState()
+        LoadImageFromUrl(
+            modifier = Modifier
+                .padding(bottom = 70.dp)
+                .fillMaxSize(),
+            url = if (backgroundPic != null) backgroundPic else ngoAccount.ngoImage,
+            placeholderPainter = painterResource(id = R.drawable.ic_launcher_background),
+            errorPainter = painterResource(id = R.drawable.ic_launcher_background)
+        )
+
         IconButton( // to select background image
-            onClick = { imagePickerLauncherBackground.launch("image/*") },
+            onClick = {
+                imagePickerLauncherBackground.launch("image/*")
+                imageType.value = "B"
+            },
             modifier = Modifier
                 .padding(bottom = 30.dp)
                 .align(Alignment.BottomEnd)
@@ -379,42 +371,30 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
                 modifier = Modifier.size(32.dp)
             )
         }
-        // Profile image picker
-        val inputStreamProfile = profilePicUri?.let { context.contentResolver.openInputStream(it) }
-        val bitmapProfilePic = BitmapFactory.decodeStream(inputStreamProfile)
+        val profilePic by viewModel.profilePicUrl.collectAsState()
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
         ) {
             Box(
                 modifier = Modifier
-                    .size(140.dp)
+                    .size(144.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
             ) {
-                bitmapProfilePic?.let {
-                    Image(
-                        bitmap = bitmapProfilePic.asImageBitmap(),
-                        contentDescription = "Profile image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center),
-                        contentScale = ContentScale.FillBounds
-                    )
-                } ?: run {
-                    Image(
-                        painter = painterResource(id = R.drawable.iconamoon_profile_fill),
-                        contentDescription = "Profile image",
-                        modifier = Modifier
-                            .size(130.dp)
-                            .clip(CircleShape)
-                            .align(Alignment.Center),
-                    )
-                }
+                // profile image
+                LoadImageFromUrl(
+                    modifier = Modifier.fillMaxSize().padding(4.dp).clip(CircleShape),
+                    url = if (profilePic != null) profilePic else ngoAccount.profileImage,
+                    placeholderPainter = painterResource(id = R.drawable.iconamoon_profile_fill),
+                    errorPainter = painterResource(id = R.drawable.iconamoon_profile_fill)
+                )
             }
 
-            IconButton( // to select profile image
-                onClick = { imagePickerLauncherProfile.launch("image/*") },
+            IconButton( // to select profile image: open image picker
+                onClick = {
+                    imagePickerLauncherProfile.launch("image/*")
+                    imageType.value = "P"
+                },
                 modifier = Modifier
                     .padding(
                         end = if (configuration.orientation == 1) (configuration.screenWidthDp / 3 - 4).dp else (configuration.screenWidthDp / 3 + 62).dp,
@@ -432,7 +412,6 @@ fun UserProfileImage(modifier: Modifier = Modifier, viewModel: ProfileViewModel)
             }
         }
     }
-
 }
 
 @Composable
