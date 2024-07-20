@@ -1,6 +1,7 @@
 package com.learn.sevasahyog.ngo_home.data
 
 import com.learn.sevasahyog.ngo_home.items.event.data.CreateEvent
+import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.data.EventResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -17,9 +18,10 @@ interface NgoService {
         @Path("id") id: String
     ): Response<NgoAccount>
 
-    @PUT("/account/ngo/updateImage/{id}")
+    @PUT("/account/ngo/updateImage/{userId}")
     suspend fun updateProfileBackgroundPic(
         @Header("Authorization") token: String,
+        @Path("userId") id: String,
         @Body updatePicsRequest: UpdatePicsRequest
     ): Response<NgoAccount>
 
@@ -28,4 +30,10 @@ interface NgoService {
         @Header("Authorization") token: String,
         @Body createEventBody: CreateEvent
     ): Response<EventResponse>
+
+    @GET("/ngo/events/user/{id}")
+    suspend fun getEventListByUser(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ):Response<List<Event>>
 }

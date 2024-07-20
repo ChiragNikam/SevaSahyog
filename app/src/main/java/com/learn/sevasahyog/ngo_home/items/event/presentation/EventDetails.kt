@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
@@ -37,6 +38,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,10 +62,16 @@ import com.learn.sevasahyog.R
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
+import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun EventDetailScreen(navController: NavController) {
+fun EventDetailScreen(
+    navController: NavController,
+    viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val eventData by viewModel.eventResponse.collectAsState()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +84,10 @@ fun EventDetailScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { navController.navigateUp() }) {
+                IconButton(onClick = {
+                    navController.navigateUp()
+                    viewModel.clearData()
+                }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "back"
@@ -101,35 +112,64 @@ fun EventDetailScreen(navController: NavController) {
 
             // event details
             var isEventLongDescriptionExpanded by remember { mutableStateOf(false) }
+            var isEventShortDescExpanded by remember { mutableStateOf(false) }
             CardInfoView(label = "Event Details") {
+                // event name
                 DataViewInCard(
-                    info = "eventName",
+                    info = eventData.name,
                     infoDesc = "Event Name",
                     image = Icons.Default.AccountBox
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 // event date
-                DataViewInCard(info = "eventDate", infoDesc = "Date", image = Icons.Default.DateRange)
+                DataViewInCard(
+                    info = "${eventData.dd}/${eventData.mm}/${eventData.yyyy}",
+                    infoDesc = "Date",
+                    image = Icons.Default.DateRange
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 // event location
-                DataViewInCard(info = "eventLocation", infoDesc = "Location", image = Icons.Default.LocationOn)
+                DataViewInCard(
+                    info = eventData.location,
+                    infoDesc = "Location",
+                    image = Icons.Default.LocationOn
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 // event organizer name
-                DataViewInCard(info = "eventOrganizer", infoDesc = "Organizer", image = Icons.Default.Person)
+                DataViewInCard(
+                    info = eventData.organizer,
+                    infoDesc = "Organizer",
+                    image = Icons.Default.Person
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 // organizer mobile number
-                DataViewInCard(info = "mobile", infoDesc = "Mobile", image = Icons.Default.Phone)
+                DataViewInCard(
+                    info = eventData.organizerPhone,
+                    infoDesc = "Mobile",
+                    image = Icons.Default.Phone
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
+                // event short description
+                ExpandableInfoRow(
+                    text = eventData.shortDesc,
+                    expanded = isEventShortDescExpanded,
+                    onToggleExpand = {
+                        isEventShortDescExpanded = !isEventShortDescExpanded
+                    },
+                    imageVector = Icons.Default.Info
+                )
                 // event long description
                 ExpandableInfoRow(
-                    text = "eventLongDescription",
+                    text = eventData.longDesc,
                     expanded = isEventLongDescriptionExpanded,
-                    onToggleExpand = { isEventLongDescriptionExpanded = !isEventLongDescriptionExpanded },
+                    onToggleExpand = {
+                        isEventLongDescriptionExpanded = !isEventLongDescriptionExpanded
+                    },
                     imageVector = Icons.AutoMirrored.Filled.List
                 )
 
@@ -153,7 +193,10 @@ fun EventDetailScreen(navController: NavController) {
                             contentDescription = "liveCheck"
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        EventStatus(isLive = false)
+
+                        // event status
+                        EventStatus(eventStatus = eventData.status)
+
                         Spacer(modifier = Modifier.weight(1f))
                         OutlinedButton(
                             onClick = { },
@@ -174,7 +217,7 @@ fun EventDetailScreen(navController: NavController) {
 }
 
 @Composable
-fun EventStatus(isLive: Boolean) {
+fun EventStatus(eventStatus: Int) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -183,7 +226,12 @@ fun EventStatus(isLive: Boolean) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if (isLive) "Ongoing" else "Finished",
+                text = when (eventStatus) {
+                    0 -> "Past"
+                    1 -> "Ongoing"
+                    2 -> "Upcoming"
+                    else -> "NULL"
+                },
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -191,7 +239,7 @@ fun EventStatus(isLive: Boolean) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ellipse_5),
                 contentDescription = null,
-                tint = if (isLive) Color.Green else Color.Red
+                tint = if (eventStatus == 1) Color.Green else if (eventStatus == 2) Color.Red else Color.Blue,
             )
         }
         Text(text = "Event Status", fontSize = MaterialTheme.typography.labelMedium.fontSize)

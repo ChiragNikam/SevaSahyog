@@ -1,6 +1,4 @@
-package com.learn.sevasahyog.auth.data.dataclass
-
-import android.os.Message
+package com.learn.sevasahyog.data
 
 data class ErrorResponse(
     val errorCode: Int,

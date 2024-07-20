@@ -1,5 +1,6 @@
 package com.learn.sevasahyog.ngo_home.items.event.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -19,24 +20,40 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.learn.sevasahyog.ngo_home.items.event.data.EventByYear
+import com.learn.sevasahyog.auth.domain.SessionManager
+import com.learn.sevasahyog.ngo_home.items.event.data.Event
+import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
+import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 
 @Composable
-fun ViewEventsScreen(appNavController: NavController) {
+fun ViewEventsScreen(appNavController: NavController,
+                     viewModel: EventsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
 
-    val events = listOf(
-        EventByYear(name = "Event 1", date = "2024-01-15"),
-        EventByYear(name = "Event 2", date = "2024-03-22"),
-        EventByYear(name = "Event 3", date = "2024-06-10"),
-        EventByYear(name = "Event 4", date = "2024-08-05"),
-        EventByYear(name = "Event 5", date = "2024-12-20")
-    )
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+
+
+    val session =
+        SessionManager(context)   // session to get the user details stored in shared-preference
+    val data = session.getUserDetails()
+    // set token and uid to view-model for network requests
+    data["token"]?.let { viewModel.updateAccessToken(it)
+        Log.d("tokenId",it)}
+    data["uid"]?.let { viewModel.updateUserId(it)
+    Log.d("userId",it)}
+
+
+
+    viewModel.loadEventByUser()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -60,20 +77,20 @@ fun ViewEventsScreen(appNavController: NavController) {
             )
             Spacer(modifier = Modifier.height(14.dp))
 
-            LazyColumn {
-                items(events) { event ->
-                    EventItem(event = event, onClick = {
-                        appNavController.navigate("event/eventItemByYearScreen")
-                    })
-                }
-            }
+//            LazyColumn {
+//                items(events) { event ->
+//                    EventItem(event = event, onClick = {
+//                        appNavController.navigate("event/eventItemByYearScreen")
+//                    })
+//                }
+//            }
 
         }
     }
 }
 
 @Composable
-fun EventItem(event: EventByYear, onClick: () -> Unit) {
+fun EventItem(event: Event, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,7 +108,7 @@ fun EventItem(event: EventByYear, onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = event.date,
+                text = event.dd.toString(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Normal,
                 modifier = Modifier.padding(top = 4.dp)

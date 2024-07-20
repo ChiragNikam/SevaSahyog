@@ -5,17 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
-import com.learn.sevasahyog.auth.data.dataclass.ErrorResponse
 import com.learn.sevasahyog.common.BASE_URL
+import com.learn.sevasahyog.data.ErrorResponse
 import com.learn.sevasahyog.network.RetrofitInstance
-import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.data.NgoService
 import com.learn.sevasahyog.ngo_home.items.event.data.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.data.EventRequest
+import com.learn.sevasahyog.ngo_home.items.event.data.EventResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.create
 
 class EventViewModel : ViewModel() {
 
@@ -43,8 +42,24 @@ class EventViewModel : ViewModel() {
         _event.value = update(_event.value)
     }
 
+    private val _eventResponse = MutableStateFlow(EventResponse())
+    val eventResponse get() = _eventResponse.asStateFlow()
+
+    private val _saveEventSuccess = MutableStateFlow(false)
+    val saveEventSuccess get() = _saveEventSuccess.asStateFlow()
+
+    fun updateSaveEventSuccess(success: Boolean){
+        _saveEventSuccess.value = success
+    }
+
+
     private val ngoService = RetrofitInstance.getClient(BASE_URL)
         .create(NgoService::class.java)
+
+    fun clearData(){
+        _event.value = EventRequest()
+        _eventResponse.value = EventResponse()
+    }
 
     // Function to create event
      fun createEvent() {
@@ -58,9 +73,8 @@ class EventViewModel : ViewModel() {
                 )
 
                 if (eventResponse.isSuccessful) {
-                    val savedEvent =eventResponse.body()
-                    Log.d("create_event","event response $savedEvent")
-
+                    _eventResponse.value = eventResponse.body()!!
+                    _saveEventSuccess.value = true
                 } else {
                     val errorBody = eventResponse.errorBody()?.string()
                     Log.d("error_response_raw", errorBody ?: "No error body")
