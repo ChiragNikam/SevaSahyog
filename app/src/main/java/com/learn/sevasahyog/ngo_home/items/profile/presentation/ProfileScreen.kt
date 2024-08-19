@@ -216,8 +216,9 @@ fun ProfileScreen(
                     // long description
                     ShimmerListItem(isLoading = userProfileProgress,
                         contentBeforeLoading = { ContentBeforeLoading() }) {
+
                         ExpandableInfoRow(
-                            text = ngoDescription,
+                            text = if (ngoDescription==null) "" else ngoDescription,
                             expanded = isNgoDescriptionExpanded,
                             onToggleExpand = {
                                 isNgoDescriptionExpanded = !isNgoDescriptionExpanded
