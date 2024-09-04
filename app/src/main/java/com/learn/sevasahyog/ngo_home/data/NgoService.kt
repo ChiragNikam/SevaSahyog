@@ -31,6 +31,14 @@ interface NgoService {
         @Body createEventBody: CreateEvent
     ): Response<EventResponse>
 
+    @GET("ngo/events/user/{id}/upcoming")
+    suspend fun getUpcomingEvents(
+        @Header("Authorization") token: String,
+        @Path("userId") id: String,
+    ):Response<List<Event>>
+
+
+
     @GET("/ngo/events/user/{id}")
     suspend fun getEventListByUser(
         @Header("Authorization") token: String,

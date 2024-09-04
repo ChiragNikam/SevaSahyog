@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
+import com.learn.sevasahyog.ngo_home.items.event.data.EventDummy
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 
@@ -52,7 +53,16 @@ fun ViewEventsScreen(appNavController: NavController,
 
 
 
+
     viewModel.loadEventByUser()
+
+    val dummyEvents = listOf(
+        EventDummy(eventName = "Tea and Biscuit Distribution", description = "Distribution of tea and biscuits to the needy", eventLocation = "Bihar"),
+        EventDummy(eventName = "Clothes Distribution", description = "Distributing clothes to underprivileged people", eventLocation = "Himachal" ),
+        EventDummy(eventName = "Health Camp", description = "Organizing a health camp for the community", eventLocation = "Delhi"),
+        EventDummy(eventName = "Educational Workshop", description = "Conducting an educational workshop for children", eventLocation = "Rajasthan"),
+        EventDummy(eventName = "Tree Plantation Drive", description = "Planting trees in the local community", eventLocation = "Pune")
+    )
 
     Surface(
         modifier = Modifier
@@ -77,20 +87,20 @@ fun ViewEventsScreen(appNavController: NavController,
             )
             Spacer(modifier = Modifier.height(14.dp))
 
-//            LazyColumn {
-//                items(events) { event ->
-//                    EventItem(event = event, onClick = {
-//                        appNavController.navigate("event/eventItemByYearScreen")
-//                    })
-//                }
-//            }
+            LazyColumn {
+                items(dummyEvents) { event ->
+                    EventItem(event =event, onClick = {
+                        appNavController.navigate("event/eventDetailScreen")
+                    })
+                }
+            }
 
         }
     }
 }
 
 @Composable
-fun EventItem(event: Event, onClick: () -> Unit) {
+fun EventItem(event: EventDummy, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -103,12 +113,19 @@ fun EventItem(event: Event, onClick: () -> Unit) {
                 .padding(16.dp)
         ) {
             Text(
-                text = event.name,
+                text = event.eventName,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = event.dd.toString(),
+                text = event.description,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+
+            Text(
+                text = event.eventLocation,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Normal,
                 modifier = Modifier.padding(top = 4.dp)

@@ -1,5 +1,6 @@
 package com.learn.sevasahyog.ngo_home.items.event.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +28,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -37,11 +43,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.auth.domain.SessionManager
+import com.learn.sevasahyog.ngo_home.items.event.domain.UpcomingEventViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun EventScreen(navController: NavController, appNavController: NavController) {
-    Scaffold (
+fun EventScreen(
+    navController: NavController,
+    appNavController: NavController,
+    viewModel: UpcomingEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+
+
+    val session =
+        SessionManager(context)   // session to get the user details stored in shared-preference
+    val data = session.getUserDetails()
+    // set token and uid to view-model for network requests
+    data["token"]?.let {
+        viewModel.updateAccessToken(it)
+        Log.d("tokenId", it)
+    }
+    data["uid"]?.let {
+        viewModel.updateUserId(it)
+        Log.d("userId", it)
+    }
+
+    Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -50,10 +80,22 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
                 modifier = Modifier
                     .padding(bottom = 8.dp)
             ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Event", tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add Event",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         }
-    ){
+    ) {
+
+
+        val upcomingEvents by viewModel.upcomingEvents.collectAsState()
+
+        LaunchedEffect(Unit) {
+            viewModel.loadUpcomingEvents()
+        }
+
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,19 +112,25 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
                     fontWeight = FontWeight(700)
                 )
                 Spacer(modifier = Modifier.height(18.dp))
-                Text(modifier = Modifier.padding(start = 20.dp), text = "UPCOMING EVENTS", letterSpacing = 2.sp, style = MaterialTheme.typography.labelLarge)
+                Text(
+                    modifier = Modifier.padding(start = 20.dp),
+                    text = "UPCOMING EVENTS",
+                    letterSpacing = 2.sp,
+                    style = MaterialTheme.typography.labelLarge
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 LazyRow(
                     modifier = Modifier,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item { Spacer(modifier = Modifier.width(4.dp)) }
-                    items(6){
+                    items(upcomingEvents.size) { index ->
+                        val event = upcomingEvents[index]
                         UpcomingEvent(
-                            eventName = "Office Meeting",
-                            leadBy = "Rajat kr",
-                            dateOfEvent = "12/08/2024"
-                        ){
+                            eventName = event.name,
+                            leadBy = event.organizer,
+                            dateOfEvent = "${event.dd}/${event.mm}/${event.yyyy}"
+                        ) {
                             appNavController.navigate("event/eventDetailScreen")
                         }
                     }
@@ -91,8 +139,12 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                Column (modifier = Modifier.padding(horizontal = 16.dp)){
-                    Text(text = "PAST EVENTS", letterSpacing = 2.sp, style = MaterialTheme.typography.labelLarge)
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        text = "PAST EVENTS",
+                        letterSpacing = 2.sp,
+                        style = MaterialTheme.typography.labelLarge
+                    )
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -101,7 +153,7 @@ fun EventScreen(navController: NavController, appNavController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(8){ index ->
+                        items(8) { index ->
                             PastEvent(eventYear = "202$index", onClick = {
                                 appNavController.navigate("event/viewEventScreen")
                             })
@@ -202,6 +254,9 @@ fun PastEvent(eventYear: String, onClick: () -> Unit) {
 @Composable
 private fun PreviewEventScreen() {
     SevaSahyogTheme {
-        EventScreen(navController = rememberNavController(), appNavController = rememberNavController())
+        EventScreen(
+            navController = rememberNavController(),
+            appNavController = rememberNavController()
+        )
     }
 }
