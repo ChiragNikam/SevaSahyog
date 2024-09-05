@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -91,9 +92,11 @@ fun EventScreen(
 
 
         val upcomingEvents by viewModel.upcomingEvents.collectAsState()
+        val pastEventYears by viewModel.pastEventYears.collectAsState()
 
         LaunchedEffect(Unit) {
             viewModel.loadUpcomingEvents()
+            viewModel.loadPastEventYears()
         }
 
         Surface(
@@ -153,10 +156,10 @@ fun EventScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(8) { index ->
-                            PastEvent(eventYear = "202$index", onClick = {
+                        items(pastEventYears){ year ->
+                            PastEvent(eventYear = "$year") {
                                 appNavController.navigate("event/viewEventScreen")
-                            })
+                            }
                         }
                         item { Spacer(modifier = Modifier.height(12.dp)) }
                     }

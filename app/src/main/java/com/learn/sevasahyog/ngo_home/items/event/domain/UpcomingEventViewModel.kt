@@ -34,6 +34,9 @@ class UpcomingEventViewModel: ViewModel() {
     private val _userId= MutableStateFlow("")
     val userId get() = _userId.asStateFlow()
 
+    private val _pastYearEvents = MutableStateFlow(ArrayList<Int>())
+    val pastEventYears get() = _pastYearEvents.asStateFlow()
+
     fun updateUserId(userId:String){
         _userId.value=userId
     }
@@ -47,14 +50,9 @@ class UpcomingEventViewModel: ViewModel() {
             try {
                 val response = ngoService.getUpcomingEvents("Bearer ${accessToken.value}",userId.value)
 
-                // Log the raw response
-                Log.d("UpcomingEventViewModel1", "Response: ${response.raw()}")
-
                 if (response.isSuccessful) {
                     _upcomingEvents.value = response.body() ?: emptyList()
 
-                    // Log the list of upcoming events
-                    Log.d("UpcomingEventViewModel2", "Upcoming events: ${_upcomingEvents.value}")
                 } else {
                     val errorMessage = "Error: ${response.code()} ${response.message()}"
                     _error.value = errorMessage
@@ -69,8 +67,20 @@ class UpcomingEventViewModel: ViewModel() {
                 Log.e("UpcomingEventViewModel4", "Exception: ${e.localizedMessage}", e)
             }
         }
-
-
     }
 
+    fun loadPastEventYears(){
+        viewModelScope.launch {
+            try {
+                val response = ngoService.getPastEventYears("Bearer ${accessToken.value}",userId.value)
+
+                if (response.isSuccessful){
+                    _pastYearEvents.value = (response.body() ?: emptyList()) as ArrayList<Int>
+                    Log.d("event_years", pastEventYears.value.toString())
+                }
+            } catch (e: Exception){
+                e.localizedMessage?.let { Log.e("error_fetching_years", it) }
+            }
+        }
+    }
 }

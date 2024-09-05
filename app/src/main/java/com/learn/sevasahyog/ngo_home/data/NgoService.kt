@@ -37,7 +37,11 @@ interface NgoService {
         @Path("id") id: String,
     ):Response<List<Event>>
 
-
+    @GET("ngo/events/user/{id}/pastEventYears")
+    suspend fun getPastEventYears(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ):Response<List<Int>>
 
     @GET("/ngo/events/user/{id}")
     suspend fun getEventListByUser(
