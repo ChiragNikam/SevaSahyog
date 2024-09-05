@@ -45,7 +45,7 @@ class UpcomingEventViewModel: ViewModel() {
     fun loadUpcomingEvents() {
         viewModelScope.launch {
             try {
-                val response = ngoService.getUpcomingEvents(_accessToken.value,userId.value)
+                val response = ngoService.getUpcomingEvents("Bearer ${accessToken.value}",userId.value)
 
                 // Log the raw response
                 Log.d("UpcomingEventViewModel1", "Response: ${response.raw()}")

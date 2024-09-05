@@ -34,7 +34,7 @@ interface NgoService {
     @GET("ngo/events/user/{id}/upcoming")
     suspend fun getUpcomingEvents(
         @Header("Authorization") token: String,
-        @Path("userId") id: String,
+        @Path("id") id: String,
     ):Response<List<Event>>
 
 
