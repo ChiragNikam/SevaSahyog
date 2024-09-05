@@ -89,12 +89,10 @@ fun EventScreen(
             }
         }
     ) {
-
-
         val upcomingEvents by viewModel.upcomingEvents.collectAsState()
         val pastEventYears by viewModel.pastEventYears.collectAsState()
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(Unit) {  // network call for data to be loaded on screen
             viewModel.loadUpcomingEvents()
             viewModel.loadPastEventYears()
         }
@@ -151,12 +149,13 @@ fun EventScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    // grid for all past year events
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(minSize = 128.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(pastEventYears){ year ->
+                        items(pastEventYears.reversed()){ year ->
                             PastEvent(eventYear = "$year") {
                                 appNavController.navigate("event/viewEventScreen")
                             }
@@ -167,7 +166,6 @@ fun EventScreen(
             }
         }
     }
-
 }
 
 @Composable

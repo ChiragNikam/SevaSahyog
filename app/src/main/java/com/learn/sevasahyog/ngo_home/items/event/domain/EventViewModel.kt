@@ -13,48 +13,57 @@ import com.learn.sevasahyog.ngo_home.data.NgoService
 import com.learn.sevasahyog.ngo_home.items.event.data.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.data.EventRequest
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.ArrayList
 
 class EventsViewModel : ViewModel() {
 
-// access token
-private val _accessToken = MutableStateFlow("")
-val accessToken get() = _accessToken
+    // access token
+    private val _accessToken = MutableStateFlow("")
+    val accessToken get() = _accessToken
 
-fun updateAccessToken(token: String) {
-    _accessToken.value = token
-}
+    fun updateAccessToken(token: String) {
+        _accessToken.value = token
+    }
 
-private val ngoService = RetrofitInstance.getClient(BASE_URL)
-    .create(NgoService::class.java)
+    private val ngoService = RetrofitInstance.getClient(BASE_URL)
+        .create(NgoService::class.java)
 
 
-private val _error = MutableStateFlow<String?>(null)
-val error: StateFlow<String?> get() = _error.asStateFlow()
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> get() = _error.asStateFlow()
 
-    private val _eventList =MutableStateFlow(listOf<Event>())
-    val  eventList get() = _eventList.asStateFlow()
+    private val _eventList = MutableStateFlow(listOf<Event>())
+    val eventList get() = _eventList.asStateFlow()
 
-    private val _userId= MutableStateFlow("")
+    private val _eventsByYearList = MutableStateFlow<List<Event>>(emptyList())
+    val eventsByYearList get() = _eventsByYearList.asStateFlow()
+
+    private val _userId = MutableStateFlow("")
     val userId get() = _userId.asStateFlow()
 
-    fun updateUserId(userId:String){
-        _userId.value=userId
+    fun updateUserId(userId: String) {
+        _userId.value = userId
     }
-    @SuppressLint("SuspiciousIndentation")
-    fun loadEventByUser() {
+
+    suspend fun loadEventByUser(eventYear: Int) {
         viewModelScope.launch {
             try {
 
-            val eventListResponse=ngoService.getEventListByUser(accessToken.value, userId.value)
+                val eventListResponse =
+                    ngoService.getEventListByUser("Bearer ${accessToken.value}", userId.value)
 
-                Log.d("eventByUser","event by user  ${_eventList.value}")
                 if (eventListResponse.isSuccessful) {
-                     _eventList.value= eventListResponse.body()!!
-                    Log.d("eventsByUser" ,_eventList.value.toString())
+
+                    _eventList.value = eventListResponse.body()!!
+
+                    // filter those events by year
+                    _eventsByYearList.value = filterEventsByYear(eventYear)
+                    Log.d("event at 2024", eventsByYearList.value.toString())
 
                 } else {
                     val errorBody = eventListResponse.errorBody()?.string()
@@ -76,6 +85,18 @@ val error: StateFlow<String?> get() = _error.asStateFlow()
                 Log.e("NetworkError", "Error creating event", e)
             }
         }
+    }
+
+    fun filterEventsByYear(year: Int): List<Event>{
+
+        val filteredEvent = mutableListOf<Event>()
+        for (event in eventList.value){
+            if (year == event.yyyy){
+                filteredEvent.add(event)
+            }
+        }
+
+        return filteredEvent
     }
 }
 
