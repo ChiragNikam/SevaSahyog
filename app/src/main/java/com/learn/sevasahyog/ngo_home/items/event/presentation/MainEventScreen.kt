@@ -157,7 +157,6 @@ fun MainEventScreen(
                     ) {
                         items(pastEventYears.reversed()){ year ->
                             PastEvent(eventYear = "$year") {
-//                                viewModel.updateSelectedEventYear(year)
                                 appNavController.navigate("event/viewEventScreen/$year")
                             }
                         }
