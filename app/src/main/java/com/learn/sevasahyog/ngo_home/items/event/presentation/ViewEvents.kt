@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.domain.SessionManager
+import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.data.EventDummy
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
@@ -72,7 +74,6 @@ fun ViewEventsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadEventByUser(yearOfEvents)
-        Log.d("events_at_$selectedEventYear", eventByYearList.toString())
     }
 
     Surface(
@@ -111,7 +112,7 @@ fun ViewEventsScreen(
             LazyColumn {
                 items(eventByYearList) { event ->
                     EventItem(event = event, onClick = {
-                        appNavController.navigate("event/eventDetailScreen")
+                        appNavController.navigate("event/eventDetailScreen/${event.eventId}")
                     })
                 }
             }
@@ -133,51 +134,58 @@ fun EventItem(event: Event, onClick: () -> Unit) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
+            // event name
             Text(
                 text = event.name,
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            // long description
             Text(
                 text = event.longDesc,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Normal,
+                lineHeight = 16.sp,
                 modifier = Modifier.padding(top = 4.dp)
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Row {
+            // date and location
+            Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(18.dp),
                         imageVector = Icons.Filled.LocationOn,
-                        contentDescription = "Location"
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.primary
                     )
-
+                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = event.location.toString(),
                         style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.padding(top = 4.dp)
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
-                Row {
+                Spacer(modifier = Modifier.width(28.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(18.dp),
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Date"
+                        contentDescription = "Date",
+                        tint = MaterialTheme.colorScheme.primary
                     )
-
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "${event.dd}/${event.mm}/${event.yyyy}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.padding(top = 4.dp)
+                        style = MaterialTheme.typography.bodySmall, 
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -190,3 +198,10 @@ fun EventItem(event: Event, onClick: () -> Unit) {
 private fun ViewEventsScreenPreview() {
     ViewEventsScreen(appNavController = rememberNavController(), yearOfEvents = 2021)
 }
+
+@Preview
+@Composable
+private fun EventItemPrev() {
+    EventItem(event = Event(11, "Event Name", "short Desc", "", "", "", "location", 11, 12, 2024, 2, NgoAccount())){}
+}
+

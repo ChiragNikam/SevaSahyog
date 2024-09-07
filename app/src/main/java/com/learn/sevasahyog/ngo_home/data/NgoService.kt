@@ -35,17 +35,24 @@ interface NgoService {
     suspend fun getUpcomingEvents(
         @Header("Authorization") token: String,
         @Path("id") id: String,
-    ):Response<List<Event>>
+    ): Response<List<Event>>
 
     @GET("ngo/events/user/{id}/pastEventYears")
     suspend fun getPastEventYears(
         @Header("Authorization") token: String,
         @Path("id") id: String
-    ):Response<List<Int>>
+    ): Response<List<Int>>
 
     @GET("/ngo/events/user/{id}")
     suspend fun getEventListByUser(
         @Header("Authorization") token: String,
         @Path("id") id: String
-    ):Response<List<Event>>
+    ): Response<List<Event>>
+
+    @GET("/ngo/events/user/{userId}/{eventId}")
+    suspend fun getEventByItsId(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: String,
+        @Path("eventId") eventId: Long
+    ): Response<EventResponse>
 }

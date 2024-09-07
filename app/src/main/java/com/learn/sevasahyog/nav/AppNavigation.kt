@@ -85,14 +85,23 @@ fun AppNavigation(navController: NavHostController, isLoggedIn: Boolean) {
                     CreateEvent(navController, viewModel = createEventViewModel)
                 }
                 composable(
-                    route = "event/eventDetailScreen",
+                    route = "event/eventDetailScreen/{eventId}",
                     enterTransition = { inHorizontal },
-                    popExitTransition = { outHorizontal }
-                ) {
-                    EventDetailScreen(
-                        navController = navController,
-                        viewModel = createEventViewModel
+                    popExitTransition = { outHorizontal },
+                    arguments = listOf(
+                        navArgument("eventId"){
+                            type = NavType.LongType
+                        }
                     )
+                ) {
+                    val eventId = it.arguments?.getLong("eventId")
+                    if (eventId != null) {
+                        EventDetailScreen(
+                            navController = navController,
+//                            viewModel = createEventViewModel,
+                            eventId = eventId
+                        )
+                    }
                 }
                 composable(
                     route = "event/viewEventScreen/{year_of_events}",

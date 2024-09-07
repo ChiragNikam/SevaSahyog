@@ -132,7 +132,7 @@ fun MainEventScreen(
                             leadBy = event.organizer,
                             dateOfEvent = "${event.dd}/${event.mm}/${event.yyyy}"
                         ) {
-                            appNavController.navigate("event/eventDetailScreen")
+                            appNavController.navigate("event/eventDetailScreen/${event.eventId}")
                         }
                     }
                     item { Spacer(modifier = Modifier.width(4.dp)) }

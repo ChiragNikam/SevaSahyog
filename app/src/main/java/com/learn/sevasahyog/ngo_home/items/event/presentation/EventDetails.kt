@@ -2,6 +2,7 @@ package com.learn.sevasahyog.ngo_home.items.event.presentation
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -38,6 +39,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,18 +61,40 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.R
+import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
+import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
 fun EventDetailScreen(
     navController: NavController,
-    viewModel: CreateEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: EventsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    eventId: Long
 ) {
+    val context = LocalContext.current
+    val session =
+        SessionManager(context)   // session to get the user details stored in shared-preference
+    val data = session.getUserDetails()
+    // set token and uid to view-model for network requests
+    data["token"]?.let {
+        viewModel.updateAccessToken(it)
+        Log.d("tokenId", it)
+    }
+    data["uid"]?.let {
+        viewModel.updateUserId(it)
+        Log.d("userId", it)
+    }
+
     val eventData by viewModel.eventResponse.collectAsState()
+
+    LaunchedEffect (Unit) {
+        Log.d("event_id", eventId.toString())
+        viewModel.getEventByItsId(eventId)
+    }
 
     Surface(
         modifier = Modifier
@@ -86,7 +110,7 @@ fun EventDetailScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {
                     navController.navigateUp()
-                    viewModel.clearData()
+//                    viewModel.clearData()
                 }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -338,6 +362,6 @@ private fun PreviewUploadImageBox() {
 @Composable
 private fun PreviewEventDetailScreen() {
     SevaSahyogTheme {
-        EventDetailScreen(rememberNavController())
+        EventDetailScreen(rememberNavController(), eventId = 56)
     }
 }

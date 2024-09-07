@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.learn.sevasahyog.common.BASE_URL
@@ -13,6 +14,7 @@ import com.learn.sevasahyog.ngo_home.data.NgoService
 import com.learn.sevasahyog.ngo_home.items.event.data.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.data.EventRequest
+import com.learn.sevasahyog.ngo_home.items.event.data.EventResponse
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,7 +66,6 @@ class EventsViewModel : ViewModel() {
 
                     // filter those events by year
                     _eventsByYearList.value = filterEventsByYear(eventYear)
-                    Log.d("event at 2024", eventsByYearList.value.toString())
 
                 } else {
                     val errorBody = eventListResponse.errorBody()?.string()
@@ -88,11 +89,11 @@ class EventsViewModel : ViewModel() {
         }
     }
 
-    fun filterEventsByYear(year: Int): List<Event>{
+    fun filterEventsByYear(year: Int): List<Event> {
 
         val filteredEvent = mutableListOf<Event>()
-        for (event in eventList.value){
-            if (year == event.yyyy){
+        for (event in eventList.value) {
+            if (year == event.yyyy) {
                 filteredEvent.add(event)
             }
         }
@@ -110,7 +111,7 @@ class EventsViewModel : ViewModel() {
     private val _selectedEventYear = MutableStateFlow(0)
     val selectedEventYear get() = _selectedEventYear.asStateFlow()
 
-    fun updateSelectedEventYear(year: Int){
+    fun updateSelectedEventYear(year: Int) {
         Log.d("year_updated", "year: $year")
         _selectedEventYear.value = year
     }
@@ -119,7 +120,8 @@ class EventsViewModel : ViewModel() {
     fun loadUpcomingEvents() {
         viewModelScope.launch {
             try {
-                val response = ngoService.getUpcomingEvents("Bearer ${accessToken.value}",userId.value)
+                val response =
+                    ngoService.getUpcomingEvents("Bearer ${accessToken.value}", userId.value)
 
                 if (response.isSuccessful) {
                     _upcomingEvents.value = response.body() ?: emptyList()
@@ -140,16 +142,35 @@ class EventsViewModel : ViewModel() {
         }
     }
 
-    fun loadPastEventYears(){
+    fun loadPastEventYears() {
         viewModelScope.launch {
             try {
-                val response = ngoService.getPastEventYears("Bearer ${accessToken.value}",userId.value)
+                val response =
+                    ngoService.getPastEventYears("Bearer ${accessToken.value}", userId.value)
 
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     _pastYearEvents.value = (response.body() ?: emptyList()) as ArrayList<Int>
                     Log.d("event_years", pastEventYears.value.toString())
                 }
-            } catch (e: Exception){
+            } catch (e: Exception) {
+                e.localizedMessage?.let { Log.e("error_fetching_years", it) }
+            }
+        }
+    }
+
+    private val _eventResponse = MutableStateFlow(EventResponse())
+    val eventResponse get() = _eventResponse.asStateFlow()
+
+    fun getEventByItsId(eventId: Long) {
+        viewModelScope.launch {
+            try {
+                val response = ngoService.getEventByItsId("Bearer ${accessToken.value}", userId = userId.value, eventId = eventId)
+                if (response.isSuccessful){
+                    _eventResponse.value = response.body()!!
+                } else {
+                    Log.e("event_response_fail", "failed to get response")
+                }
+            } catch (e: Exception) {
                 e.localizedMessage?.let { Log.e("error_fetching_years", it) }
             }
         }
