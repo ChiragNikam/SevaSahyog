@@ -45,14 +45,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.domain.SessionManager
-import com.learn.sevasahyog.ngo_home.items.event.domain.UpcomingEventViewModel
+import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
-fun EventScreen(
+fun MainEventScreen(
     navController: NavController,
     appNavController: NavController,
-    viewModel: UpcomingEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: EventsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
 
     val context = LocalContext.current
@@ -157,7 +157,8 @@ fun EventScreen(
                     ) {
                         items(pastEventYears.reversed()){ year ->
                             PastEvent(eventYear = "$year") {
-                                appNavController.navigate("event/viewEventScreen")
+//                                viewModel.updateSelectedEventYear(year)
+                                appNavController.navigate("event/viewEventScreen/$year")
                             }
                         }
                         item { Spacer(modifier = Modifier.height(12.dp)) }
@@ -255,7 +256,7 @@ fun PastEvent(eventYear: String, onClick: () -> Unit) {
 @Composable
 private fun PreviewEventScreen() {
     SevaSahyogTheme {
-        EventScreen(
+        MainEventScreen(
             navController = rememberNavController(),
             appNavController = rememberNavController()
         )

@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.LocationOn
@@ -42,39 +40,38 @@ import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.data.EventDummy
-import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 
 @Composable
-fun ViewEventsScreen(appNavController: NavController,
-                     viewModel: EventsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun ViewEventsScreen(
+    appNavController: NavController,
+    viewModel: EventsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    yearOfEvents: Int
+) {
 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
 
     val eventByYearList by viewModel.eventsByYearList.collectAsState()
+    val selectedEventYear by viewModel.selectedEventYear.collectAsState()
 
     val session =
         SessionManager(context)   // session to get the user details stored in shared-preference
     val data = session.getUserDetails()
     // set token and uid to view-model for network requests
-    data["token"]?.let { viewModel.updateAccessToken(it)
-        Log.d("tokenId",it)}
-    data["uid"]?.let { viewModel.updateUserId(it)
-    Log.d("userId",it)}
-
-    LaunchedEffect(Unit) {
-        viewModel.loadEventByUser(2021)
-        Log.d("events_at_2024", eventByYearList.toString())
+    data["token"]?.let {
+        viewModel.updateAccessToken(it)
+        Log.d("tokenId", it)
+    }
+    data["uid"]?.let {
+        viewModel.updateUserId(it)
+        Log.d("userId", it)
     }
 
-    val dummyEvents = listOf(
-        EventDummy(eventName = "Tea and Biscuit Distribution", description = "Distribution of tea and biscuits to the needy", eventLocation = "Bihar"),
-        EventDummy(eventName = "Clothes Distribution", description = "Distributing clothes to underprivileged people", eventLocation = "Himachal" ),
-        EventDummy(eventName = "Health Camp", description = "Organizing a health camp for the community", eventLocation = "Delhi"),
-        EventDummy(eventName = "Educational Workshop", description = "Conducting an educational workshop for children", eventLocation = "Rajasthan"),
-        EventDummy(eventName = "Tree Plantation Drive", description = "Planting trees in the local community", eventLocation = "Pune")
-    )
+    LaunchedEffect(Unit) {
+        viewModel.loadEventByUser(yearOfEvents)
+        Log.d("events_at_$selectedEventYear", eventByYearList.toString())
+    }
 
     Surface(
         modifier = Modifier
@@ -85,7 +82,7 @@ fun ViewEventsScreen(appNavController: NavController,
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "2024",
+                text = "$yearOfEvents",
                 fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                 fontWeight = FontWeight(700)
             )
@@ -138,9 +135,16 @@ fun EventItem(event: Event, onClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Row (verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Row {
-                    Icon(modifier = Modifier.size(18.dp), imageVector = Icons.Filled.LocationOn, contentDescription = "Location")
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = Icons.Filled.LocationOn,
+                        contentDescription = "Location"
+                    )
 
                     Text(
                         text = event.location.toString(),
@@ -151,10 +155,14 @@ fun EventItem(event: Event, onClick: () -> Unit) {
                 }
 
                 Row {
-                    Icon(modifier = Modifier.size(18.dp), imageVector = Icons.Filled.DateRange, contentDescription = "Date")
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Date"
+                    )
 
                     Text(
-                        text = "${ event.dd }/${event.mm}/${event.yyyy}",
+                        text = "${event.dd}/${event.mm}/${event.yyyy}",
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Normal,
                         modifier = Modifier.padding(top = 4.dp)
@@ -168,5 +176,5 @@ fun EventItem(event: Event, onClick: () -> Unit) {
 @Preview
 @Composable
 private fun ViewEventsScreenPreview() {
-    ViewEventsScreen(appNavController = rememberNavController())
+    ViewEventsScreen(appNavController = rememberNavController(), yearOfEvents = 2021)
 }

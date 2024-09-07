@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class EventViewModel : ViewModel() {
+class CreateEventViewModel : ViewModel() {
 
     // access token
     private val _accessToken = MutableStateFlow("")

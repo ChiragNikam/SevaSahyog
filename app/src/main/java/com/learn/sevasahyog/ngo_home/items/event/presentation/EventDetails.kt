@@ -62,13 +62,13 @@ import com.learn.sevasahyog.R
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
-import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
+import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 
 @Composable
 fun EventDetailScreen(
     navController: NavController,
-    viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: CreateEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val eventData by viewModel.eventResponse.collectAsState()
 

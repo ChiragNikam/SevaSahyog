@@ -15,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,8 +27,7 @@ import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.LabeledTextField
 import com.learn.sevasahyog.common.SevaSehyogDatePicker
 import com.learn.sevasahyog.common.getDateComponents
-import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
-import java.sql.Date
+import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -37,7 +35,7 @@ import java.util.Locale
 @Composable
 fun CreateEvent(
     appNavController: NavController,
-    viewModel: EventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: CreateEventViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
 

@@ -6,18 +6,19 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.learn.sevasahyog.SplashScreen
 import com.learn.sevasahyog.auth.presentation.ChooseAccountType
 import com.learn.sevasahyog.auth.presentation.SignIn
 import com.learn.sevasahyog.auth.presentation.SignUpNgo
 import com.learn.sevasahyog.auth.presentation.SingUpUser
-import com.learn.sevasahyog.ngo_home.items.event.domain.EventViewModel
+import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
 import com.learn.sevasahyog.ngo_home.items.event.presentation.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.presentation.EventDetailScreen
-import com.learn.sevasahyog.ngo_home.items.event.presentation.EventItemByYear
 import com.learn.sevasahyog.ngo_home.items.event.presentation.ViewEventsScreen
 import com.learn.sevasahyog.ngo_home.presentation.HomeBottomNav
 
@@ -32,7 +33,7 @@ fun AppNavigation(navController: NavHostController, isLoggedIn: Boolean) {
         animationSpec = tween(durationMillis = 300)
     )
 
-    val eventViewModel: EventViewModel = viewModel()
+    val createEventViewModel: CreateEventViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -81,30 +82,41 @@ fun AppNavigation(navController: NavHostController, isLoggedIn: Boolean) {
                     enterTransition = { inHorizontal },
                     popExitTransition = { outHorizontal }
                 ) {
-                    CreateEvent(navController, viewModel = eventViewModel)
+                    CreateEvent(navController, viewModel = createEventViewModel)
                 }
                 composable(
                     route = "event/eventDetailScreen",
                     enterTransition = { inHorizontal },
                     popExitTransition = { outHorizontal }
                 ) {
-                    EventDetailScreen(navController = navController, viewModel = eventViewModel)
+                    EventDetailScreen(
+                        navController = navController,
+                        viewModel = createEventViewModel
+                    )
                 }
                 composable(
-                    route="event/viewEventScreen",
-                    enterTransition = {inHorizontal},
-                    popExitTransition = {outHorizontal}
+                    route = "event/viewEventScreen/{year_of_events}",
+                    enterTransition = { inHorizontal },
+                    popExitTransition = { outHorizontal },
+                    arguments = listOf(
+                        navArgument("year_of_events"){
+                            type = NavType.IntType
+                        }
+                    )
                 ) {
-                        ViewEventsScreen(appNavController = navController)
+                    val yearOfEvents = it.arguments?.getInt("year_of_events")
+                    if (yearOfEvents != null) {
+                        ViewEventsScreen(appNavController = navController, yearOfEvents = yearOfEvents)
                     }
-
-                composable(
-                    route="event/eventItemByYearScreen",
-                    enterTransition = {inHorizontal},
-                    popExitTransition = {outHorizontal}
-                ) {
-                   EventItemByYear(appNavController = navController)
                 }
+
+//                composable(
+//                    route="event/eventItemByYearScreen",
+//                    enterTransition = {inHorizontal},
+//                    popExitTransition = {outHorizontal}
+//                ) {
+//                   EventItemByYear(appNavController = navController)
+//                }
 
             }
         }

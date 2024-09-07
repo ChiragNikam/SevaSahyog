@@ -50,6 +50,7 @@ class EventsViewModel : ViewModel() {
         _userId.value = userId
     }
 
+    // for main events
     suspend fun loadEventByUser(eventYear: Int) {
         viewModelScope.launch {
             try {
@@ -97,6 +98,61 @@ class EventsViewModel : ViewModel() {
         }
 
         return filteredEvent
+    }
+
+    // for upcoming events
+    private val _upcomingEvents = MutableStateFlow<List<Event>>(emptyList())
+    val upcomingEvents: StateFlow<List<Event>> = _upcomingEvents
+
+    private val _pastYearEvents = MutableStateFlow(ArrayList<Int>())
+    val pastEventYears get() = _pastYearEvents.asStateFlow()
+
+    private val _selectedEventYear = MutableStateFlow(0)
+    val selectedEventYear get() = _selectedEventYear.asStateFlow()
+
+    fun updateSelectedEventYear(year: Int){
+        Log.d("year_updated", "year: $year")
+        _selectedEventYear.value = year
+    }
+
+    // Function to load upcoming events
+    fun loadUpcomingEvents() {
+        viewModelScope.launch {
+            try {
+                val response = ngoService.getUpcomingEvents("Bearer ${accessToken.value}",userId.value)
+
+                if (response.isSuccessful) {
+                    _upcomingEvents.value = response.body() ?: emptyList()
+
+                } else {
+                    val errorMessage = "Error: ${response.code()} ${response.message()}"
+                    _error.value = errorMessage
+
+                    // Log the error response
+                    Log.e("UpcomingEventViewModel3", errorMessage)
+                }
+            } catch (e: Exception) {
+                _error.value = e.localizedMessage
+
+                // Log the exception message
+                Log.e("UpcomingEventViewModel4", "Exception: ${e.localizedMessage}", e)
+            }
+        }
+    }
+
+    fun loadPastEventYears(){
+        viewModelScope.launch {
+            try {
+                val response = ngoService.getPastEventYears("Bearer ${accessToken.value}",userId.value)
+
+                if (response.isSuccessful){
+                    _pastYearEvents.value = (response.body() ?: emptyList()) as ArrayList<Int>
+                    Log.d("event_years", pastEventYears.value.toString())
+                }
+            } catch (e: Exception){
+                e.localizedMessage?.let { Log.e("error_fetching_years", it) }
+            }
+        }
     }
 }
 
