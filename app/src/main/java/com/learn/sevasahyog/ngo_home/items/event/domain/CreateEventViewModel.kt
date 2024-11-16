@@ -96,6 +96,7 @@ class CreateEventViewModel : ViewModel() {
                 Log.e("NetworkError", "Error creating event", e)
             }
         }
+
     }
 }
 
