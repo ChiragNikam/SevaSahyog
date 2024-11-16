@@ -1,10 +1,13 @@
 package com.learn.sevasahyog.ngo_home.items.event.domain
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.learn.sevasahyog.common.BASE_URL
@@ -15,11 +18,13 @@ import com.learn.sevasahyog.ngo_home.items.event.data.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.data.EventRequest
 import com.learn.sevasahyog.ngo_home.items.event.data.EventResponse
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.ArrayList
 
 class EventsViewModel : ViewModel() {
@@ -48,8 +53,73 @@ class EventsViewModel : ViewModel() {
     private val _userId = MutableStateFlow("")
     val userId get() = _userId.asStateFlow()
 
+    // internet connection
+    private val _internetConnection = MutableStateFlow(true)
+    val internetConnection get() = _internetConnection.asStateFlow()
+
+    private val handler = CoroutineExceptionHandler { _, throwable ->
+        _internetConnection.value = false
+        throwable.localizedMessage?.let { Log.e("error", it) }
+    }
+
     fun updateUserId(userId: String) {
         _userId.value = userId
+    }
+
+    private val _eventImageUrl = MutableStateFlow<String?>(null)
+    val eventImageUrl get() = _eventImageUrl.asStateFlow()
+
+    fun updateEventUrl(url: String) {
+        this._eventImageUrl.value = url
+    }
+
+    private val _eventResponse = MutableStateFlow(EventResponse())
+    val eventResponse get() = _eventResponse.asStateFlow()
+
+    fun getEventByItsId(eventId: Long) {
+        viewModelScope.launch {
+            try {
+                val response = ngoService.getEventByItsId("Bearer ${accessToken.value}", userId = userId.value, eventId = eventId)
+                if (response.isSuccessful){
+                    _eventResponse.value = response.body()!!
+                } else {
+                    Log.e("event_response_fail", "failed to get response")
+                }
+            } catch (e: Exception) {
+                e.localizedMessage?.let { Log.e("error_fetching_years", it) }
+            }
+        }
+    }
+
+    suspend fun uploadImagesToFirebase(
+        uris: List<Uri>,
+        eventId: String,
+        onSuccess: (List<String>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        viewModelScope.launch {
+            val storageReference = FirebaseStorage.getInstance().reference
+            val uploadedImageUrls = mutableListOf<String>()
+
+            try {
+                uris.forEach { uri ->
+                    // Create a unique filename
+                    val fileName = "${System.currentTimeMillis()}.jpg"
+                    val fileRef: StorageReference = storageReference.child("EventsImages: $eventId/$fileName")
+                    // Upload the file and get the download URL
+                    fileRef.putFile(uri).await()
+                    val downloadUrl = fileRef.downloadUrl.await().toString()
+
+                    // Add the download URL to the list
+                    uploadedImageUrls.add(downloadUrl)
+                }
+
+                // Return the list of uploaded image URLs
+                onSuccess(uploadedImageUrls)
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+        }
     }
 
     // for main events
@@ -158,22 +228,6 @@ class EventsViewModel : ViewModel() {
         }
     }
 
-    private val _eventResponse = MutableStateFlow(EventResponse())
-    val eventResponse get() = _eventResponse.asStateFlow()
 
-    fun getEventByItsId(eventId: Long) {
-        viewModelScope.launch {
-            try {
-                val response = ngoService.getEventByItsId("Bearer ${accessToken.value}", userId = userId.value, eventId = eventId)
-                if (response.isSuccessful){
-                    _eventResponse.value = response.body()!!
-                } else {
-                    Log.e("event_response_fail", "failed to get response")
-                }
-            } catch (e: Exception) {
-                e.localizedMessage?.let { Log.e("error_fetching_years", it) }
-            }
-        }
-    }
 }
 

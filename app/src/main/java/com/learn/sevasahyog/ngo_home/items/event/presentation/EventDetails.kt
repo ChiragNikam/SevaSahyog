@@ -44,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,8 +59,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.storage.FirebaseStorage
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.CardInfoView
@@ -68,6 +71,7 @@ import com.learn.sevasahyog.common.ExpandableInfoRow
 import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun EventDetailScreen(
@@ -235,7 +239,7 @@ fun EventDetailScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // upload image
-            UploadImageBox()    // TODO: Add URI's to view model
+            UploadImageBox( viewModel = EventsViewModel(), eventId = eventId)
         }
     }
 }
@@ -271,90 +275,81 @@ fun EventStatus(eventStatus: Int) {
 }
 
 @Composable
-fun UploadImageBox() {
+fun UploadImageBox(viewModel: EventsViewModel, eventId: Long) {
     val context = LocalContext.current
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope() // Create a coroutine scope for the composable
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             imageUris = uris
+            coroutineScope.launch { // Launch a coroutine to call the suspend function
+                try {
+                    viewModel.uploadImagesToFirebase(
+                        uris = uris,
+                        eventId = eventId.toString(),
+                        onSuccess = { urls ->
+                            viewModel.updateEventUrl(urls.joinToString(","))
+                            Log.d("ImageUpload", "Images uploaded successfully: $urls")
+                        },
+                        onFailure = { exception ->
+                            Log.e("ImageUpload", "Error uploading image: ${exception.message}")
+                        }
+                    )
+                } catch (e: Exception) {
+                    Log.e("ImageUpload", "Error in coroutine: ${e.message}")
+                }
+            }
         }
     }
 
-    Box(
-        modifier = Modifier
-            .padding(14.dp)
-            .fillMaxSize()
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { imagePickerLauncher.launch("image/*") },
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.bi_image),
+                contentDescription = "Upload Icon",
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Upload Image", fontSize = 18.sp, textAlign = TextAlign.Center)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Start)
-                    .clickable { imagePickerLauncher.launch("image/*") },
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.bi_image),
-                    contentDescription = "icons",
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .size(28.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "Upload Image",
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { imagePickerLauncher.launch("image/*") }) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
+        if (imageUris.isNotEmpty()) {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(imageUris.size) { index ->
+                    val uri = imageUris[index]
+                    val inputStream = context.contentResolver.openInputStream(uri)
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = "Selected Image",
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        contentDescription = "upload Image Icon",
+                            .size(100.dp)
+                            .background(Color.White)
+                            .padding(8.dp)
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(10.dp))
-
-            if (imageUris.isNotEmpty()) {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(imageUris.size) { index ->
-                        val uri = imageUris[index]
-                        val inputStream = context.contentResolver.openInputStream(uri)
-                        val bitmap = BitmapFactory.decodeStream(inputStream)
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "Selected Image",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .background(Color.White)
-                                .padding(8.dp)
-                        )
-                    }
-                }
-            } else Icon(
-                painter = painterResource(id = R.drawable.bi_image),
-                contentDescription = "Upload Image",
-            )
-
         }
     }
 }
+
+
 
 @Preview
 @Composable
 private fun PreviewUploadImageBox() {
     SevaSahyogTheme {
-        UploadImageBox()
+        UploadImageBox(viewModel = EventsViewModel(), eventId = 123)
     }
 }
 
