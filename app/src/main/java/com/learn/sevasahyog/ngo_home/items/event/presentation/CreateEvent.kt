@@ -91,12 +91,14 @@ fun CreateEvent(
         }
     ) {
         val savedEventSuccess by viewModel.saveEventSuccess.collectAsState()
+        val eventResponse by viewModel.eventResponse.collectAsState()
         if (savedEventSuccess) {
             Toast.makeText(context, "Event Saved successfully", Toast.LENGTH_SHORT).show()
             viewModel.updateSaveEventSuccess(false)
             appNavController.navigateUp()
-            appNavController.navigate("event/eventDetailScreen")
+            appNavController.navigate("event/eventDetailScreen/${eventResponse.eventId}")
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
