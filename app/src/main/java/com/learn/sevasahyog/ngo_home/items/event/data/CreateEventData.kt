@@ -24,7 +24,8 @@ data class EventResponse(
     var dd: Int = 0,
     var mm: Int = 0,
     var yyyy: Int = 0,
-    var status: Int = 0
+    var status: Int = 0,
+    var eventImagesUrls: List<String>? = listOf()
 )
 
 data class CreateEvent(

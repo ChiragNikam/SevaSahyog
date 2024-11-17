@@ -3,8 +3,10 @@ package com.learn.sevasahyog.ngo_home.items.event.presentation
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,12 +22,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
@@ -38,6 +45,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +56,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -59,20 +68,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.google.firebase.storage.FirebaseStorage
 import com.learn.sevasahyog.R
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.common.CardInfoView
 import com.learn.sevasahyog.common.DataViewInCard
 import com.learn.sevasahyog.common.ExpandableInfoRow
+import com.learn.sevasahyog.common.LoadImageFromUrl
 import com.learn.sevasahyog.ngo_home.items.event.domain.CreateEventViewModel
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EventDetailScreen(
     navController: NavController,
@@ -86,16 +99,14 @@ fun EventDetailScreen(
     // set token and uid to view-model for network requests
     data["token"]?.let {
         viewModel.updateAccessToken(it)
-        Log.d("tokenId", it)
     }
     data["uid"]?.let {
         viewModel.updateUserId(it)
-        Log.d("userId", it)
     }
 
     val eventData by viewModel.eventResponse.collectAsState()
 
-    LaunchedEffect (Unit) {
+    LaunchedEffect(Unit) {
         Log.d("event_id", eventId.toString())
         viewModel.getEventByItsId(eventId)
     }
@@ -114,7 +125,6 @@ fun EventDetailScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {
                     navController.navigateUp()
-//                    viewModel.clearData()
                 }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -236,10 +246,71 @@ fun EventDetailScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // upload image
-            UploadImageBox( viewModel = EventsViewModel(), eventId = eventId)
+            val eventImagesUrls by viewModel.eventImagesUrls.collectAsState()
+
+            val pagerState = rememberPagerState(
+                pageCount = { eventData.eventImagesUrls?.size ?: 0 }
+            )
+            if (eventData.eventImagesUrls?.isNotEmpty() == true) {
+                val eventImages = eventData.eventImagesUrls
+                HorizontalPager(
+                    modifier = Modifier
+                        .height(350.dp)
+                        .fillMaxWidth(),
+                    state = pagerState,
+                    pageSpacing = 12.dp
+                ) { page ->
+//                    if (page == eventData.eventImagesUrls!!.size) {
+//                        // icon to add images
+//                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            Box(
+//                                modifier = Modifier.background(
+//                                    color = MaterialTheme.colorScheme.secondary,
+//                                    shape = CircleShape
+//                                )
+//                            ) {
+//                                IconButton(onClick = { /*TODO*/ }) {
+//                                    Icon(
+//                                        imageVector = Icons.Default.Add,
+//                                        contentDescription = "Add Images",
+//                                        tint = MaterialTheme.colorScheme.onSecondary
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    } else {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        LoadImageFromUrl(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(16.dp)),
+                            url = eventImages?.get(page),
+                            placeholderPainter = painterResource(id = R.drawable.ic_launcher_background),
+                            errorPainter = painterResource(id = R.drawable.ic_launcher_background)
+                        )
+                    }
+//                    }
+                }
+                Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            modifier = Modifier.fillMaxSize(),
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = "Add image",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            } else {
+                // upload image
+                UploadImageBox(viewModel = viewModel, eventId = eventId)
+            }
+            Spacer(modifier = Modifier.height(62.dp))
         }
     }
 }
@@ -291,7 +362,7 @@ fun UploadImageBox(viewModel: EventsViewModel, eventId: Long) {
                         uris = uris,
                         eventId = eventId.toString(),
                         onSuccess = { urls ->
-                            viewModel.updateEventUrl(urls.joinToString(","))
+                            viewModel.updateEventImagesUrlByAPI(urls, eventId)
                             Log.d("ImageUpload", "Images uploaded successfully: $urls")
                         },
                         onFailure = { exception ->
@@ -299,6 +370,11 @@ fun UploadImageBox(viewModel: EventsViewModel, eventId: Long) {
                         }
                     )
                 } catch (e: Exception) {
+                    Toast.makeText(
+                        context,
+                        "Failed to Upload images. Please retry!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     Log.e("ImageUpload", "Error in coroutine: ${e.message}")
                 }
             }
@@ -309,7 +385,9 @@ fun UploadImageBox(viewModel: EventsViewModel, eventId: Long) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { imagePickerLauncher.launch("image/*") },
+                .clickable {
+                    imagePickerLauncher.launch("image/*")
+                },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -322,27 +400,8 @@ fun UploadImageBox(viewModel: EventsViewModel, eventId: Long) {
             Text(text = "Upload Image", fontSize = 18.sp, textAlign = TextAlign.Center)
         }
         Spacer(modifier = Modifier.height(10.dp))
-
-        if (imageUris.isNotEmpty()) {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(imageUris.size) { index ->
-                    val uri = imageUris[index]
-                    val inputStream = context.contentResolver.openInputStream(uri)
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "Selected Image",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(Color.White)
-                            .padding(8.dp)
-                    )
-                }
-            }
-        }
     }
 }
-
 
 
 @Preview

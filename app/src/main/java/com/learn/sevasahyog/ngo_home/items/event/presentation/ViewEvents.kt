@@ -3,7 +3,6 @@ package com.learn.sevasahyog.ngo_home.items.event.presentation
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,7 +42,6 @@ import androidx.navigation.compose.rememberNavController
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
-import com.learn.sevasahyog.ngo_home.items.event.data.EventDummy
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 
 @Composable
@@ -202,6 +200,6 @@ private fun ViewEventsScreenPreview() {
 @Preview
 @Composable
 private fun EventItemPrev() {
-    EventItem(event = Event(11, "Event Name", "short Desc", "", "", "", "location", 11, 12, 2024, 2, NgoAccount())){}
+    EventItem(event = Event(11, "Event Name", "short Desc", "", "", "", "location", 11, 12, 2024, 2, NgoAccount(), null)){}
 }
 

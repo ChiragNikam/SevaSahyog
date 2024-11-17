@@ -25,10 +25,19 @@ interface NgoService {
         @Body updatePicsRequest: UpdatePicsRequest
     ): Response<NgoAccount>
 
+    // Event Endpoints
+
     @POST("ngo/events")
     suspend fun createEvent(
         @Header("Authorization") token: String,
         @Body createEventBody: CreateEvent
+    ): Response<EventResponse>
+
+    @PUT("ngo/events/{eventId}/eventImages")
+    suspend fun updateEventImages(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: Long,
+        @Body eventImagesUrls: List<String>
     ): Response<EventResponse>
 
     @GET("ngo/events/user/{id}/upcoming")

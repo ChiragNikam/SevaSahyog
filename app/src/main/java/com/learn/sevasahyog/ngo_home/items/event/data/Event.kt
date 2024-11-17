@@ -14,5 +14,6 @@ data class Event(
     val mm: Int,
     val yyyy: Int,
     val status: Int,
-    val ngoAccount: NgoAccount
+    val ngoAccount: NgoAccount,
+    val eventImagesUrls: List<String>?
 )

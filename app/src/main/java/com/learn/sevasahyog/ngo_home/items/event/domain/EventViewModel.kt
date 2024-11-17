@@ -66,11 +66,11 @@ class EventsViewModel : ViewModel() {
         _userId.value = userId
     }
 
-    private val _eventImageUrl = MutableStateFlow<String?>(null)
-    val eventImageUrl get() = _eventImageUrl.asStateFlow()
+    private val _eventImagesUrls = MutableStateFlow<List<String>>(listOf())
+    val eventImagesUrls get() = _eventImagesUrls.asStateFlow()
 
-    fun updateEventUrl(url: String) {
-        this._eventImageUrl.value = url
+    fun updateEventImagesUrls(urls: List<String>) {
+        this._eventImagesUrls.value = urls
     }
 
     private val _eventResponse = MutableStateFlow(EventResponse())
@@ -91,6 +91,7 @@ class EventsViewModel : ViewModel() {
         }
     }
 
+    // uploading event images to firebase and getting download link of images
     suspend fun uploadImagesToFirebase(
         uris: List<Uri>,
         eventId: String,
@@ -105,7 +106,7 @@ class EventsViewModel : ViewModel() {
                 uris.forEach { uri ->
                     // Create a unique filename
                     val fileName = "${System.currentTimeMillis()}.jpg"
-                    val fileRef: StorageReference = storageReference.child("EventsImages: $eventId/$fileName")
+                    val fileRef: StorageReference = storageReference.child("${userId.value}/Events/$eventId/$fileName")
                     // Upload the file and get the download URL
                     fileRef.putFile(uri).await()
                     val downloadUrl = fileRef.downloadUrl.await().toString()
@@ -118,6 +119,27 @@ class EventsViewModel : ViewModel() {
                 onSuccess(uploadedImageUrls)
             } catch (e: Exception) {
                 onFailure(e)
+            }
+        }
+    }
+
+    // set download link of event images to event
+    fun updateEventImagesUrlByAPI(eventImages: List<String>, eventId: Long) {
+        viewModelScope.launch {
+            val eventImagesResponse = ngoService.updateEventImages(
+                token = "Bearer ${accessToken.value}",
+                eventId = eventId,
+                eventImagesUrls = eventImages
+            )
+
+            if(eventImagesResponse.isSuccessful){
+                val updatedEvent = eventImagesResponse.body()
+                if (updatedEvent != null) {
+                    _eventResponse.value.eventImagesUrls = updatedEvent.eventImagesUrls
+                    updatedEvent.eventImagesUrls?.let { updateEventImagesUrls(it) }
+                }
+            } else {
+                throw Exception("API call to upload image failed, due to ${eventImagesResponse.code()}, ${eventImagesResponse.errorBody()}")
             }
         }
     }
@@ -182,7 +204,6 @@ class EventsViewModel : ViewModel() {
     val selectedEventYear get() = _selectedEventYear.asStateFlow()
 
     fun updateSelectedEventYear(year: Int) {
-        Log.d("year_updated", "year: $year")
         _selectedEventYear.value = year
     }
 
@@ -220,7 +241,6 @@ class EventsViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     _pastYearEvents.value = (response.body() ?: emptyList()) as ArrayList<Int>
-                    Log.d("event_years", pastEventYears.value.toString())
                 }
             } catch (e: Exception) {
                 e.localizedMessage?.let { Log.e("error_fetching_years", it) }
