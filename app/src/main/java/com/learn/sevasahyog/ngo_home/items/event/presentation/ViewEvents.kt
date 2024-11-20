@@ -1,11 +1,13 @@
 package com.learn.sevasahyog.ngo_home.items.event.presentation
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -31,18 +34,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.auth.common.ShimmerListItem
+import com.learn.sevasahyog.auth.common.shimmerEffect
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
+import com.learn.sevasahyog.ngo_home.items.profile.presentation.ContentBeforeLoading
 
 @Composable
 fun ViewEventsScreen(
@@ -82,7 +90,7 @@ fun ViewEventsScreen(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Row (verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {
                     appNavController.navigateUp()
                 }) {
@@ -107,6 +115,12 @@ fun ViewEventsScreen(
             )
             Spacer(modifier = Modifier.height(14.dp))
 
+            // shimmer effect for loading events by year
+            ShimmerListItem(
+                isLoading = eventByYearList.isEmpty(),
+                contentBeforeLoading = { EventsBeforeLoading() }) {}
+
+            // events by year
             LazyColumn {
                 items(eventByYearList) { event ->
                     EventItem(event = event, onClick = {
@@ -115,6 +129,74 @@ fun ViewEventsScreen(
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+fun EventsBeforeLoading() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(130.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .shimmerEffect()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 22.dp, vertical = 16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(30.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .shimmerEffect()
+            ) { }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier
+                    .width(160.dp)
+                    .height(12.dp)
+                    .shimmerEffect()
+            ) { }
+            Spacer(modifier = Modifier.weight(1f))
+            Row {
+                Row {
+                    Icon(
+                        imageVector = Icons.Filled.LocationOn,
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Row(
+                        modifier = Modifier
+                            .height(22.dp)
+                            .width(70.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .shimmerEffect()
+                    ) { }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Row {
+                    Icon(
+                        imageVector = Icons.Filled.DateRange,
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Row(
+                        modifier = Modifier
+                            .height(22.dp)
+                            .width(70.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .shimmerEffect()
+                    ) { }
+                }
+            }
         }
     }
 }
@@ -139,9 +221,9 @@ fun EventItem(event: Event, onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // long description
             Text(
                 text = event.longDesc,
@@ -182,13 +264,19 @@ fun EventItem(event: Event, onClick: () -> Unit) {
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "${event.dd}/${event.mm}/${event.yyyy}",
-                        style = MaterialTheme.typography.bodySmall, 
+                        style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PrevContentBeforeLoading() {
+    EventsBeforeLoading()
 }
 
 @Preview
@@ -200,6 +288,22 @@ private fun ViewEventsScreenPreview() {
 @Preview
 @Composable
 private fun EventItemPrev() {
-    EventItem(event = Event(11, "Event Name", "short Desc", "", "", "", "location", 11, 12, 2024, 2, NgoAccount(), null)){}
+    EventItem(
+        event = Event(
+            11,
+            "Event Name",
+            "short Desc",
+            "",
+            "",
+            "",
+            "location",
+            11,
+            12,
+            2024,
+            2,
+            NgoAccount(),
+            null
+        )
+    ) {}
 }
 

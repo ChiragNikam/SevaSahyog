@@ -74,6 +74,10 @@ class ProfileViewModel : ViewModel() {
         RetrofitInstance.getClient(BASE_URL)
             .create(NgoService::class.java)
 
+    fun updateUserProfileProgress(progress: Boolean) {
+        _userProfileProgress.value = progress
+    }
+
     fun loadProfile() {
         viewModelScope.launch(handler) {
             // if internet available
@@ -84,7 +88,7 @@ class ProfileViewModel : ViewModel() {
 
             if (userProfileResponse.isSuccessful) {
                 _profile.value = userProfileResponse.body()!!
-                _userProfileProgress.value = false
+//                _userProfileProgress.value = false
             } else {
                 val errorBody = userProfileResponse.errorBody()?.string()
                 Log.d("error_response_raw", errorBody ?: "No error body")
@@ -100,7 +104,7 @@ class ProfileViewModel : ViewModel() {
                 }
 
                 Log.d("error_response", userProfileResponse.code().toString())
-                _userProfileProgress.value = false
+//                _userProfileProgress.value = false
             }
         }
     }

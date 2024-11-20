@@ -68,6 +68,11 @@ fun ProfileScreen(
     // do network request for the user profile and load it to view-model
     viewModel.loadProfile()
 
+    val profile by viewModel.profile.collectAsState()
+    if(profile.userName.isNotEmpty()) {
+        viewModel.updateUserProfileProgress(false)
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -101,6 +106,7 @@ fun ProfileScreen(
         }
 
         if (internetConnection) Column {
+
             Column(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp)
             ) {
@@ -116,6 +122,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
             val userProfileProgress by viewModel.userProfileProgress.collectAsState()
+
             if (userProfileProgress) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
             // User Profile and Ngo Image
@@ -131,7 +138,6 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                val profile by viewModel.profile.collectAsState()
                 // user info
                 val userName = profile.userName
                 val mobileNo = profile.mobileNo
