@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 
 android {
@@ -59,6 +60,24 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Retrofit for network requests
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+
+    // navigation animation
+    implementation (libs.accompanist.navigation.animation)
+
+    // firebase storage
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.storage.ktx)
+
+    // coil
+    implementation (libs.coil.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
