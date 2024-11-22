@@ -1,13 +1,11 @@
 package com.learn.sevasahyog.ngo_home.items.event.presentation
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,7 +47,6 @@ import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.data.NgoAccount
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
-import com.learn.sevasahyog.ngo_home.items.profile.presentation.ContentBeforeLoading
 
 @Composable
 fun ViewEventsScreen(
@@ -71,11 +67,9 @@ fun ViewEventsScreen(
     // set token and uid to view-model for network requests
     data["token"]?.let {
         viewModel.updateAccessToken(it)
-        Log.d("tokenId", it)
     }
     data["uid"]?.let {
         viewModel.updateUserId(it)
-        Log.d("userId", it)
     }
 
     LaunchedEffect(Unit) {
@@ -302,7 +296,7 @@ private fun EventItemPrev() {
             2024,
             2,
             NgoAccount(),
-            null
+            listOf()
         )
     ) {}
 }

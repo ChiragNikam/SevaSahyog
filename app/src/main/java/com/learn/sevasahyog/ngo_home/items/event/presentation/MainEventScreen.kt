@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,15 +27,18 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
@@ -44,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.learn.sevasahyog.auth.common.ShimmerListItem
+import com.learn.sevasahyog.auth.common.shimmerEffect
 import com.learn.sevasahyog.auth.domain.SessionManager
 import com.learn.sevasahyog.ngo_home.items.event.domain.EventsViewModel
 import com.learn.sevasahyog.ui.theme.SevaSahyogTheme
@@ -65,11 +72,9 @@ fun MainEventScreen(
     // set token and uid to view-model for network requests
     data["token"]?.let {
         viewModel.updateAccessToken(it)
-        Log.d("tokenId", it)
     }
     data["uid"]?.let {
         viewModel.updateUserId(it)
-        Log.d("userId", it)
     }
 
     Scaffold(
@@ -91,6 +96,7 @@ fun MainEventScreen(
     ) {
         val upcomingEvents by viewModel.upcomingEvents.collectAsState()
         val pastEventYears by viewModel.pastEventYears.collectAsState()
+        val upcomingEventShimmerEffect by viewModel.upcomingEventShimmerEffect.collectAsState()
 
         LaunchedEffect(Unit) {  // network call for data to be loaded on screen
             viewModel.loadUpcomingEvents()
@@ -112,14 +118,39 @@ fun MainEventScreen(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight(700)
                 )
+
                 Spacer(modifier = Modifier.height(18.dp))
+
                 Text(
                     modifier = Modifier.padding(start = 20.dp),
                     text = "UPCOMING EVENTS",
                     letterSpacing = 2.sp,
                     style = MaterialTheme.typography.labelLarge
                 )
+
                 Spacer(modifier = Modifier.height(12.dp))
+
+                // shimmer effect for upcoming events
+                ShimmerListItem(
+                    isLoading = upcomingEventShimmerEffect,
+                    contentBeforeLoading = { UpcomingEventBeforeLoading() }
+                ) {
+                    if(upcomingEvents.isEmpty()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Spacer(modifier = Modifier.padding(top = 12.dp))
+                                Text(text = "No available Upcoming event")
+                                OutlinedButton(onClick = { appNavController.navigate("event/createEventScreen") }) {
+                                    Text(text = "Create", fontWeight = FontWeight(700), fontSize = 22.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 LazyRow(
                     modifier = Modifier,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -127,6 +158,7 @@ fun MainEventScreen(
                     item { Spacer(modifier = Modifier.width(4.dp)) }
                     items(upcomingEvents.size) { index ->
                         val event = upcomingEvents[index]
+
                         UpcomingEvent(
                             eventName = event.name,
                             leadBy = event.organizer,
@@ -149,13 +181,19 @@ fun MainEventScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    // Shimmer Effect before loading past events
+                    ShimmerListItem(
+                        isLoading = pastEventYears.isEmpty(),
+                        contentBeforeLoading = { PastEventGridBeforeLoading()}
+                    ) {}
+
                     // grid for all past year events
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(minSize = 128.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(pastEventYears.reversed()){ year ->
+                        items(pastEventYears.reversed()) { year ->
                             PastEvent(eventYear = "$year") {
                                 appNavController.navigate("event/viewEventScreen/$year")
                             }
@@ -169,7 +207,56 @@ fun MainEventScreen(
 }
 
 @Composable
-fun UpcomingEvent(eventName: String, leadBy: String, dateOfEvent: String, onViewEvent: () -> Unit) {
+fun PastEventGridBeforeLoading(modifier: Modifier = Modifier) {
+    LazyVerticalGrid(
+        modifier = modifier,
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(4) {
+            Column(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(110.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffect(),
+            ) {}
+        }
+    }
+}
+
+@Composable
+fun UpcomingEventBeforeLoading(modifier: Modifier = Modifier) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        item {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+        items(3) {
+            Column(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(170.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffect(),
+            ) {}
+        }
+        item {
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
+fun UpcomingEvent(
+    eventName: String,
+    leadBy: String,
+    dateOfEvent: String,
+    onViewEvent: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -248,6 +335,14 @@ fun PastEvent(eventYear: String, onClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun PastEventGridPreview() {
+    SevaSahyogTheme {
+        PastEventGridBeforeLoading()
     }
 }
 

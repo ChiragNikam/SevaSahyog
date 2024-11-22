@@ -1,11 +1,9 @@
 package com.learn.sevasahyog.ngo_home.items.event.domain
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.gson.GsonBuilder
@@ -14,12 +12,9 @@ import com.learn.sevasahyog.common.BASE_URL
 import com.learn.sevasahyog.data.ErrorResponse
 import com.learn.sevasahyog.network.RetrofitInstance
 import com.learn.sevasahyog.ngo_home.data.NgoService
-import com.learn.sevasahyog.ngo_home.items.event.data.CreateEvent
 import com.learn.sevasahyog.ngo_home.items.event.data.Event
-import com.learn.sevasahyog.ngo_home.items.event.data.EventRequest
 import com.learn.sevasahyog.ngo_home.items.event.data.EventResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,6 +51,10 @@ class EventsViewModel : ViewModel() {
     // internet connection
     private val _internetConnection = MutableStateFlow(true)
     val internetConnection get() = _internetConnection.asStateFlow()
+
+    // are events available
+    private val _upcomingEventShimmerEffect = MutableStateFlow(true)
+    val upcomingEventShimmerEffect get() = _upcomingEventShimmerEffect.asStateFlow()
 
     private val handler = CoroutineExceptionHandler { _, throwable ->
         _internetConnection.value = false
@@ -216,7 +215,7 @@ class EventsViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     _upcomingEvents.value = response.body() ?: emptyList()
-
+                    _upcomingEventShimmerEffect.value = false
                 } else {
                     val errorMessage = "Error: ${response.code()} ${response.message()}"
                     _error.value = errorMessage
